@@ -12,6 +12,8 @@ class Quotation extends Model
     protected $fillable = [
         'client_id',
         'vehicle_id',
+        'total',
+        'is_active'
     ];
 
     public function client()
@@ -27,5 +29,12 @@ class Quotation extends Model
     public function quotationLines()
     {
         return $this->hasMany(QuotationLine::class);
+    }
+
+
+
+    public function credit()
+    {
+        return $this->hasOne(Credit::class);
     }
 }

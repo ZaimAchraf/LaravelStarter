@@ -1,7 +1,7 @@
 @extends("backOffice.layout.panel")
 
 
-@section("title","Liste des utilisateurs")
+@section("title","Liste des Devis")
 
 @section("style_links")
 
@@ -33,7 +33,7 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>Gestion des Utilisateurs</h3>
+                    <h3>Gestion des Devis</h3>
                 </div>
             </div>
 
@@ -44,8 +44,8 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>
-                                Liste des utilisateurs
-                                <a class="ml-3" href="{{route('users.create')}}">
+                                Liste des Devis
+                                <a class="ml-3" href="{{route('quotations.create')}}">
                                     <i class="fa fa-plus-circle"></i>
                                 </a>
                             </h2>
@@ -64,56 +64,66 @@
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">
                                         <p class="text-muted font-13 m-b-30">
-                                            Pour Ajouter un utilisateur merci de cliquer sur l'icone : <i class="fa fa-plus-circle"></i> a droite du titre : "Liste des utilisateurs" au-dessus.
+                                            Pour Ajouter un devis merci de cliquer sur l'icone : <i class="fa fa-plus-circle"></i> a droite du titre : "Liste des Devis" au-dessus.
                                             <br>
-                                            Pour desactiver/activer un utilisateur vous cliquez sur l'icone <i class="fa fa-close"></i>/<i class="fa fa-check"></i>
-                                            dans ligne correspendante.
-                                            Un utilisateur avec le statut "Desactive" ne peut pas se onnecter.
                                         </p>
 
                                         <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
                                             <thead>
                                             <tr>
-                                                <th>Photo</th>
-                                                <th>Nom Complet</th>
-                                                <th>Email</th>
-                                                <th>Nom d'utilisateur</th>
-                                                <th>Telephone</th>
-                                                <th>Statut</th>
+                                                <th>#</th>
+                                                <th>Nom Client</th>
+                                                <th>Vehicule</th>
+                                                <th>Date</th>
+                                                <th>Total</th>
+                                                <th>Credit</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach ($users as $user)
+                                            @foreach ($quotations as $quotation)
                                                 <tr>
                                                     <td>
-                                                        <img src="{{asset('uploads')}}/users/{{ $user->picture }}" width="70px">
+                                                        {{$quotation->id}}
                                                     </td>
                                                     <td>
-                                                        {{ $user->name }}
+                                                        {{ $quotation->client->name }}
                                                     </td>
                                                     <td>
-                                                        {{ $user->email }}
+                                                        {{ $quotation->vehicle->label }}
                                                     </td>
                                                     <td>
-                                                        {{ $user->username }}
+                                                        {{ $quotation->created_at }}
                                                     </td>
                                                     <td>
-                                                        {{ $user->phone }}
+                                                        <b>{{ $quotation->total }} DH</b>
                                                     </td>
                                                     <td>
-                                                        <span style="word-wrap: break-word;">
-                                                            @if($user->is_active)
-                                                                <b class="text-success">Active</b>
+                                                        @if($quotation->is_active)
+                                                            @if($quotation->credit->total == $quotation->credit->paid)
+                                                                <a href="{{ route('credits.index') }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
+                                                                color: #00ff29 !important;
+                                                                font-weight: bold;"
+                                                                >
+                                                                    OK
+                                                                </a>
                                                             @else
-                                                                <b class="text-danger">Desactive</b>
+                                                                <a href="{{ route('credits.index') }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
+                                                                color: #ff2c2c !important;
+                                                                font-weight: bold;"
+                                                                >
+                                                                    {{$quotation->credit->total - $quotation->credit->paid}} DH
+                                                                </a>
                                                             @endif
-                                                        </span>
+
+                                                        @else
+                                                            <b style="color: #f8bd3f">Non Confirmé</b>
+                                                        @endif
                                                     </td>
                                                     <td>
 
                                                         <div class="d-flex p-0 m-0">
-                                                            <a href="{{ route('users.edit', $user) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
+                                                            <a href="{{ route('quotations.edit', $quotation) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;
@@ -122,7 +132,7 @@
                                                                 <i class="fa fa-edit"></i>
                                                             </a>
 
-                                                            <form class="d-inline m-0" action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr?');">
+                                                            <form class="d-inline m-0" action="{{ route('quotations.destroy', $quotation->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr?');">
                                                                 <input type="hidden" name="_method" value="DELETE">
                                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                                 <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
@@ -135,22 +145,29 @@
                                                                     <i class="fa fa-trash-o"></i>
                                                                 </button>
                                                             </form>
-                                                            <form class="d-inline m-0" action="{{ route('users.enable_disable', $user->id) }}" method="POST">
-                                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                        style="background: {{$user->is_active ? '#ff2f47' : '#2fff67'}} ;
+                                                            <a href="{{ route('quotations.getPDF', $quotation) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+                                                                    line-height: 1;
+                                                                    padding: .4em .8em !important;
+                                                                    display: flex;
+                                                                    align-items: center"
+                                                            >
+                                                                <i class="fa fa-download"></i>
+                                                            </a>
+                                                            @if(!$quotation->is_active)
+                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
+                                                                            style="background: #74fdd2;
                                                                     border: none;
                                                                     margin: 0;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;">
 
-                                                                    @if($user->is_active)
-                                                                        <i class="fa fa-close"></i>
-                                                                    @else
                                                                         <i class="fa fa-check"></i>
-                                                                    @endif
-                                                                </button>
-                                                            </form>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+
                                                         </div>
                                                     </td>
                                                 </tr>

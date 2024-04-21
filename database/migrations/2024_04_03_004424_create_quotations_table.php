@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('vehicle_id')->constrained('vehicles');
+            $table->double('total')->nullable();
+            $table->boolean('is_active')->nullable();
             $table->timestamps();
         });
     }

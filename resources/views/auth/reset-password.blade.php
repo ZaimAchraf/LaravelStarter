@@ -42,11 +42,11 @@
                         @error('password')
                         <span class="text-red-500">{{ $message }}</span>
                         @enderror
-                        <input type="password" class="form-control" name="password"  placeholder="Email" required autocomplete="new-password" />
+                        <input type="password" class="form-control" name="password"  placeholder="Password" required autocomplete="new-password" />
                     </div>
 
                     <div>
-                        <input type="password" class="form-control" name="password_confirmation" placeholder="Email" required autocomplete="new-password" />
+                        <input type="password" class="form-control" name="password_confirmation" placeholder="Confirmer Password" required autocomplete="new-password" />
                     </div>
 
                     <div class="clearfix"></div>

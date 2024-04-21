@@ -3,7 +3,7 @@
 <div class="col-md-3 left_col">
     <div class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;margin-top: 10px;">
-            <a href="{{route('dashboard')}}" class="site_title"><i class="fa fa-car"></i> <span>Auto Shop!</span></a>
+            <a href="{{route('dashboard')}}" class="site_title"><i class="fa fa-car"></i> <span>Auto Shop !</span></a>
         </div>
 
         <div class="clearfix"></div>
@@ -38,6 +38,16 @@
                         <ul class="nav child_menu">
                             <li><a href="{{route('users.index')}}">Liste des Utilisateurs</a></li>
                             <li><a href="{{route('employees.index')}}">Liste des Fonctionnaires</a></li>
+                            <li><a href="{{route('employees.index')}}">Liste des Clients</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav side-menu">
+                    <li><a><i class="fa fa-files-o"></i> Documents financiers <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="{{route('quotations.index')}}">Liste des Devis</a></li>
+                            <li><a href="{{route('credits.index')}}">Liste des Crédits</a></li>
                         </ul>
                     </li>
                 </ul>

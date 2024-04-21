@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QuotationLine extends Model
+class Credit extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'description',
-        'state',
-        'price',
-        'TVA',
-        'quantity',
-        'quotation_id'
+        'quotation_id',
+        'total',
+        'paid',
+        'comment',
     ];
 
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);
     }
+
 }
