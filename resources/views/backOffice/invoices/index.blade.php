@@ -1,7 +1,7 @@
 @extends("backOffice.layout.panel")
 
 
-@section("title","Liste des Devis")
+@section("title","Liste des Factures")
 
 @section("style_links")
 
@@ -33,7 +33,7 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>Gestion des Devis</h3>
+                    <h3>Gestion des Factures</h3>
                 </div>
             </div>
 
@@ -44,10 +44,7 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>
-                                Liste des Devis
-                                <a class="ml-3" href="{{route('quotations.create')}}">
-                                    <i class="fa fa-plus-circle"></i>
-                                </a>
+                                Liste des Facture
                             </h2>
 
                             <ul class="nav navbar-right panel_toolbox">
@@ -64,7 +61,7 @@
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">
                                         <p class="text-muted font-13 m-b-30">
-                                            Pour Ajouter un devis merci de cliquer sur l'icone : <i class="fa fa-plus-circle"></i> a droite du titre : "Liste des Devis" au-dessus.
+                                            Pour ajouter une facture merci de le faire dans la pages des devis.
                                             <br>
                                         </p>
 
@@ -72,58 +69,39 @@
                                             <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Titre</th>
                                                 <th>Nom Client</th>
                                                 <th>Vehicule</th>
                                                 <th>Date</th>
                                                 <th>Total</th>
-                                                <th>Credit</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach ($quotations as $quotation)
+                                            @foreach ($invoices as $invoice)
                                                 <tr>
                                                     <td>
-                                                        {{$quotation->id}}
+                                                        {{$invoice->id}}
                                                     </td>
                                                     <td>
-                                                        {{ $quotation->client->name }}
+                                                        {{$invoice->title}}
                                                     </td>
                                                     <td>
-                                                        {{ $quotation->vehicle->label }}
+                                                        {{ $invoice->quotation->client->name }}
                                                     </td>
                                                     <td>
-                                                        {{ $quotation->created_at }}
+                                                        {{ $invoice->quotation->vehicle->label }}
                                                     </td>
                                                     <td>
-                                                        <b>{{ $quotation->total }} DH</b>
+                                                        {{ $invoice->created_at }}
                                                     </td>
                                                     <td>
-                                                        @if($quotation->is_active)
-                                                            @if($quotation->credit->total == $quotation->credit->paid)
-                                                                <a href="{{ route('credits.index') }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
-                                                                color: #00ff29 !important;
-                                                                font-weight: bold;"
-                                                                >
-                                                                    OK
-                                                                </a>
-                                                            @else
-                                                                <a href="{{ route('credits.index') }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
-                                                                color: #ff2c2c !important;
-                                                                font-weight: bold;"
-                                                                >
-                                                                    {{$quotation->credit->total - $quotation->credit->paid}} DH
-                                                                </a>
-                                                            @endif
-
-                                                        @else
-                                                            <b style="color: #f8bd3f">Non Confirmé</b>
-                                                        @endif
+                                                        <b>{{ $invoice->total }} DH</b>
                                                     </td>
                                                     <td>
 
                                                         <div class="d-flex p-0 m-0">
-                                                            <a href="{{ route('quotations.edit', $quotation) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
+                                                            <a href="{{ route('invoices.edit', ['invoice' => $invoice]) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;
@@ -131,7 +109,7 @@
                                                             >
                                                                 <i class="fa fa-edit"></i>
                                                             </a>
-                                                            <a href="{{ route('quotations.getPDF', $quotation) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+                                                            <a href="{{ route('invoices.getPDF', $invoice) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;
@@ -139,47 +117,8 @@
                                                             >
                                                                 <i class="fa fa-file-pdf-o"></i>
                                                             </a>
-                                                            @if(!$quotation->is_active)
-                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #74fdd2;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
 
-                                                                        <i class="fa fa-check"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @else
-                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #006244;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
-
-                                                                        BL
-                                                                    </button>
-                                                                </form>
-                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #002b8c;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
-
-                                                                        facture
-                                                                    </button>
-                                                                </form>
-                                                            @endif
-
-                                                            <form class="d-inline m-0" action="{{ route('quotations.destroy', $quotation->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr?');">
+                                                            <form class="d-inline m-0" action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr?');">
                                                                 <input type="hidden" name="_method" value="DELETE">
                                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                                 <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"

@@ -154,6 +154,12 @@
                                                 </div>
                                             </div>
                                             <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Driver Name</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input type="text" value="{{ old('driver_name') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="driver_name"  placeholder="Driver name"  />
+                                                </div>
+                                            </div>
+                                            <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">Numero de contacte</label>
                                                 <div class="col-md-6 col-sm-6">
                                                     <input type="text" value="{{ old('phone_contact') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="phone_contact"  placeholder="ex. 0509002324"  />
@@ -203,6 +209,18 @@
                                             </div>
                                         </div>
                                         <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Numero police</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input class="form-control" value="{{ old('police_number') }}" data-validate-length-range="6" data-validate-words="2" name="police_number"  placeholder="" />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Kilométrage</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input class="form-control" value="{{ old('mileage') }}" data-validate-length-range="6" data-validate-words="2" name="mileage"  placeholder="" />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Numero Chassis</label>
                                             <div class="col-md-6 col-sm-6">
                                                 <input class="form-control" value="{{ old('chassis_number') }}" data-validate-length-range="6" data-validate-words="2" name="chassis_number"  placeholder="" />
@@ -213,8 +231,27 @@
 
                                 <span class="section">Informations de Devis</span>
 
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Titre de Devis</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" value="{{ old('title') }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
+                                        <hr>
+                                    </div>
+                                </div>
+
                                 <div id="lignesDevis">
                                     <div class="ligneDevis">
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <select name="lines[0][type]" id="type" class="form-control" >
+                                                    <option value="" selected disabled >Selectionner le type</option>
+                                                    <option value="Produit" >Produit</option>
+                                                    <option value="MOD">MOD</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
                                             <div class="col-md-6 col-sm-6">
@@ -226,9 +263,10 @@
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
                                             <div class="col-md-6 col-sm-6">
                                                 <select name="lines[0][state]" id="state" class="form-control" >
-                                                    <option value="" selected>Selectionner l'etat</option>
+                                                    <option value="null" selected disabled>Selectionner l'état</option>
                                                     <option value="Occasion" >Occasion</option>
-                                                    <option value="Nouveau">Nouveau</option>
+                                                    <option value="Nouveau">Neuf</option>
+                                                    <option value="Adaptable">Adaptable</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -309,6 +347,18 @@
             nouvelleLigne.classList.add('ligneDevis-new');
             nouvelleLigne.innerHTML = `
                 </hr>
+
+                <div class="field item form-group">
+                    <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
+                    <div class="col-md-6 col-sm-6">
+                        <select name="lines[${linesNumber}][type]" id="type" class="form-control" >
+                            <option value="" selected disabled>Selectionner le type</option>
+                            <option value="Produit" >Produit</option>
+                            <option value="MOD">MOD</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
                     <div class="col-md-6 col-sm-6">
@@ -319,10 +369,11 @@
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
                     <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][state]" id="state" class="form-control" >
-                            <option value="" selected>Selectionner l'etat</option>
+                        <select name="lines[0][state]" id="state" class="form-control" >
+                            <option value="null" selected disabled>Selectionner l'état</option>
                             <option value="Occasion" >Occasion</option>
-                            <option value="Nouveau">Nouveau</option>
+                            <option value="Nouveau">Neuf</option>
+                            <option value="Adaptable">Adaptable</option>
                         </select>
                     </div>
                 </div>

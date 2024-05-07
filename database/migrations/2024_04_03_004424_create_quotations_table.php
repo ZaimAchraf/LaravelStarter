@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
+            $table->string('title')->nullable();
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('vehicle_id')->constrained('vehicles');
             $table->double('total')->nullable();

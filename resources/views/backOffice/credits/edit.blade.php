@@ -44,6 +44,12 @@
                                         <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="comment" value="{{ $credit->comment }}" />
                                     </div>
                                 </div>
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Document</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input id="picture" type="file" name="documents" multiple>
+                                    </div>
+                                </div>
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">
                                         <div class="col-md-6 offset-md-3  pt-2">

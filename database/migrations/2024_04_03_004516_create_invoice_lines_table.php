@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quotation_lines', function (Blueprint $table) {
+        Schema::create('invoice_lines', function (Blueprint $table) {
             $table->id();
             $table->string("description");
             $table->integer("quantity");
+            $table->string("type");
             $table->double("price");
             $table->integer("TVA")->default(0);
             $table->string("state");
-            $table->string("type");
-            $table->foreignId('quotation_id')->constrained('quotations');
+            $table->foreignId('invoice_id')->constrained('invoices');
             $table->timestamps();
         });
     }

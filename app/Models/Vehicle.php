@@ -14,6 +14,8 @@ class Vehicle extends Model
         'registration',
         'insurance',
         'chassis_number',
+        'mileage',
+        'police_number',
         'client_id',
     ];
 

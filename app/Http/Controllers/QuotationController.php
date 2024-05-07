@@ -153,13 +153,15 @@ class QuotationController extends Controller
 
                 $vehicle = Vehicle::updateOrCreate(
                     [
-                        'registration' => $request->input('registration'),
-                        'chassis_number' => $request->input('chassis_number')
+                        'registration' => $request->input('registration')
                     ],
                     [
                         'label' => $request->input('label'),
                         'insurance' => $request->input('insurance'),
                         'client_id' => $client->id,
+                        'police_number' => $request->input('police_number'),
+                        'mileage' => $request->input('mileage'),
+                        'chassis_number' => $request->input('chassis_number')
                     ]
                 );
             }else{
@@ -174,6 +176,7 @@ class QuotationController extends Controller
             $quotation = Quotation::create([
                 'client_id' => $client->id,
                 'vehicle_id' => $vehicle->id,
+                'title' => $request->input('title'),
             ]);
 
             $total = 0;
@@ -280,15 +283,19 @@ class QuotationController extends Controller
                 'price' => $lineData['price'],
                 'TVA' => $lineData['TVA'] ?? 0,
                 'quantity' => $lineData['quantity'] ?? 1,
-                'state' => $lineData['state'],
+                'state' => $lineData['state'] == 'null' ? null : $lineData['state'],
             ]);
 
             $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
         }
 
         $quotation->total = $total;
-        $quotation->credit->total = $total;
-        $quotation->credit->save();
+
+        if ($quotation->credit) {
+            $quotation->credit->total = $total;
+            $quotation->credit->save();
+        }
+
         $quotation->save();
 
         return redirect()->back()->with('success', 'Devis bien modifié !');

@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string("registration");
             $table->string("label");
             $table->string("insurance");
-            $table->string("chassis_number");
+            $table->string("chassis_number")->nullable();
+            $table->string("police_number")->nullable();
+            $table->string("mileage")->nullable();
             $table->foreignId('client_id')->constrained('clients');
             $table->timestamps();
         });

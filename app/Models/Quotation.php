@@ -13,6 +13,7 @@ class Quotation extends Model
         'client_id',
         'vehicle_id',
         'total',
+        'title',
         'is_active'
     ];
 

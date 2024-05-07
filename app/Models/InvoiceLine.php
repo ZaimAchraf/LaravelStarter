@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QuotationLine extends Model
+class InvoiceLine extends Model
 {
     use HasFactory;
 
@@ -15,11 +15,12 @@ class QuotationLine extends Model
         'type',
         'price',
         'TVA',
-        'quantity'
+        'quantity',
+        'invoice_id'
     ];
 
-    public function quotation()
+    public function invoice()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(Invoice::class);
     }
 }

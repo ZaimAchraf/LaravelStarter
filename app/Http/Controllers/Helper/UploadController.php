@@ -9,14 +9,13 @@ use Illuminate\Http\Request;
 
 class UploadController extends Controller
 {
-
-    public static function seriePic(Request $request)
+    public static function creditDoc(Request $request)
     {
 
-        $file=$request->file('images')[0];
+        $file = $request->file('documents');
         $extension = strtolower($file->getClientOriginalExtension());
-        $filename = "serie-".uniqid(time()).".".$extension;
-        $file->move('uploads/series/',$filename);
+        $filename = "credit-".uniqid(time()).".".$extension;
+        $file->move('uploads/credits/',$filename);
 
         return $filename;
     }

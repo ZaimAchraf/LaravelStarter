@@ -1,0 +1,192 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Client;
+use App\Models\Credit;
+use App\Models\Employee;
+use App\Models\Invoice;
+use App\Models\InvoiceLine;
+use App\Models\Quotation;
+use App\Models\QuotationLine;
+use App\Models\User;
+use App\Models\Vehicle;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
+
+class InvoiceController extends Controller
+{
+
+    public function index()
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $invoices = Invoice::all();
+        return view('backOffice.invoices.index', compact('invoices'));
+    }
+
+    public function getPDF($invoiceID) {
+
+        $invoice = Invoice::find($invoiceID);
+
+//        return view('backOffice.invoices.pdf', ['invoice' => $invoice]);
+
+        $pdf = new Dompdf();
+        $pdf->loadHtml(view('backOffice.invoices.pdf', ['invoice' => $invoice]));
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $pdf->setOptions($options);
+
+        $pdf->render();
+        return  $pdf->stream(null, ['Attachment' => false]);
+    }
+
+    public function create($quotationId)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $quotation = Quotation::find($quotationId);
+
+        return view('backOffice.invoices.create', compact('quotation'));
+    }
+
+    private function validateInvoiceLines(Request $request)
+    {
+        return $request->validate([
+            'lines.*.description' => 'required|string|max:255',
+            'lines.*.price' => 'required|numeric|min:0',
+        ], [
+            'lines.*.description.required' => 'La description des ligne de facture est requise.',
+            'lines.*.price.required' => 'Le prix des lignes de facture est requis.',
+            'lines.*.price.numeric' => 'Le prix de la ligne de quotations doit être un nombre.',
+            'lines.*.price.min' => 'Le prix de la ligne de quotations doit être supérieur à 0.',
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+
+//        DB::beginTransaction();
+//
+//        try {
+
+            $this->validateInvoiceLines($request);
+
+
+
+            // Enregistrer le quotations avec ses lignes
+            $invoice = Invoice::create([
+                'quotation_id' => $request->input('quotation'),
+                'title' => $request->input('title'),
+            ]);
+
+            $total = 0;
+            foreach ($request->input('lines') as $lineData) {
+                InvoiceLine::create([
+                    'invoice_id' => $invoice->id,
+                    'description' => $lineData['description'],
+                    'price' => $lineData['price'],
+                    'type' => $lineData['type'],
+                    'TVA' => $lineData['TVA'] ?? 0,
+                    'quantity' => $lineData['quantity'] ?? 1,
+                    'state' => $lineData['state'] == 'null' ? null : $lineData['state'],
+                ]);
+
+                $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
+            }
+
+            $invoice->total = $total;
+            $invoice->save();
+
+            Log::info('Données sauvegardées avec succès.');
+            DB::commit();
+
+            // Redirection vers une page de confirmation ou de récapitulatif
+            return redirect()->route('quotations.getPDF', $invoice->id);
+
+//        } catch (\Illuminate\Validation\ValidationException $e) {
+//            DB::rollback();
+//            return response()->json(['errors' => $e->errors()], 422);
+//        }
+//        }
+////        catch (\Exception $e) {
+////            // En cas d'erreur, annulez la transaction
+////            DB::rollBack();
+////
+////            // Log pour enregistrer l'erreur
+////            Log::error('Erreur lors du traitement: ' . $e->getMessage());
+////
+////            // Gérez l'erreur ou redirigez vers une page d'erreur
+////            return redirect()->back()->with('error_message', 'Erreur lors du traitement: ' . $e->getMessage());
+////        }
+    }
+
+    public function edit(Invoice $invoice)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        return view('backOffice.invoices.edit', compact('invoice'));
+    }
+
+    public function update(Request $request)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $this->validateInvoiceLines($request);
+
+        $invoice = Invoice::find($request->input('invoiceID'));
+
+        $total = 0;
+        foreach ($request->input('lines') as $lineData) {
+
+            InvoiceLine::updateOrCreate([
+                'id' => $lineData['id']
+            ],
+                [
+                    'invoice_id' => $request->input('invoiceID'),
+                    'description' => $lineData['description'],
+                    'price' => $lineData['price'],
+                    'TVA' => $lineData['TVA'] ?? 0,
+                    'quantity' => $lineData['quantity'] ?? 1,
+                    'state' => $lineData['state'],
+                    'type' => $lineData['type'],
+                ]);
+
+            $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
+        }
+
+        $invoice->total = $total;
+
+        $invoice->save();
+
+        return redirect()->back()->with('success', 'Facture a bien été modifiée !');
+    }
+
+    public function deleteLine( Request $request )
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $line = InvoiceLine::findOrFail($request->input('line_id'));
+        $line->delete();
+
+        return 'success';
+    }
+
+    public function destroy(Invoice $invoice)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $invoice->invoiceLines()->delete();
+        $invoice->delete();
+
+        return redirect()->route('invoices.index');
+    }
+}

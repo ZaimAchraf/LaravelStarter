@@ -14,6 +14,7 @@ class Client extends Model
         'phone',
         'ICE',
         'entreprise_yn',
+        'driver_name',
         'user_id'
     ];
 

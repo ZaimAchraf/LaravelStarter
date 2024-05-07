@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helper\UploadController;
 use App\Http\Requests\UpdateCreditRequest;
 use App\Models\Credit;
+use App\Models\CreditLine;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +34,19 @@ class CreditController extends Controller
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $creditData = $request->validated();
-        $credit->paid = $creditData["paid"];
-        $credit->comment = $creditData["comment"];
+
+        $creditLine = new CreditLine();
+        $creditLine->amount = $creditData["paid"];
+        $creditLine->comment = $creditData["comment"];
+        $creditLine->credit_id = $credit->id;
+
+        if ($request->hasFile('documents')) {
+            $creditLine->document = UploadController::creditDoc($request);
+        }
+
+        $creditLine->save();
+
+        $credit->paid += $creditLine->amount;
 
         $credit->save();
 
