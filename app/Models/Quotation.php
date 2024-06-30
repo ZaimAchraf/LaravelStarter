@@ -17,6 +17,8 @@ class Quotation extends Model
         'is_active'
     ];
 
+
+
     public function client()
     {
         return $this->belongsTo(Client::class);
@@ -32,7 +34,10 @@ class Quotation extends Model
         return $this->hasMany(QuotationLine::class);
     }
 
-
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 
     public function credit()
     {

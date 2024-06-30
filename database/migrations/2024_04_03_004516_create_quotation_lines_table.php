@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('quotation_lines', function (Blueprint $table) {
             $table->id();
             $table->string("description");
-            $table->integer("quantity");
+            $table->string("reference")->nullable();
+            $table->integer("quantity")->nullable();
             $table->double("price");
             $table->integer("TVA")->default(0);
-            $table->string("state");
+            $table->string("state")->nullable();
             $table->string("type");
             $table->foreignId('quotation_id')->constrained('quotations');
             $table->timestamps();

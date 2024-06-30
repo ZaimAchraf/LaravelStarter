@@ -19,6 +19,27 @@ class UploadController extends Controller
 
         return $filename;
     }
+    public static function supplierCreditDoc(Request $request)
+    {
+
+        $file = $request->file('documents');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = "credit-".uniqid(time()).".".$extension;
+        $file->move('uploads/supplier_credits/',$filename);
+
+        return $filename;
+    }
+
+    public static function deliveryNoteDoc(Request $request)
+    {
+
+        $file = $request->file('documents');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = "delivery_notes-".uniqid(time()).".".$extension;
+        $file->move('uploads/delivery_notes/',$filename);
+
+        return $filename;
+    }
 
     public static function userPic(Request $request)
     {

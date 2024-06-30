@@ -54,6 +54,14 @@ class OrderController extends Controller
         ]);
     }
 
+    public function show(Order $order)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+
+        return view('backOffice.orders.show', compact('order'));
+    }
+
     public function edit(Order $order)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -94,10 +102,10 @@ class OrderController extends Controller
 
             } else {
                 $request->validate([
-                    'exist_provider' => 'required|string|exist:providers',
+                    'exist_provider' => 'required|string|exists:providers,id',
                 ], [
                     'exist_provider.required' => 'Le choix du fournisseur est obligatoire.',
-                    'exist_provider.exist' => 'Le Fournisseur choisi n\'existe pas dans la base de données.',
+                    'exist_provider.exists' => 'Le Fournisseur choisi n\'existe pas dans la base de données.',
                 ]);
                 $provider = Provider::find($request->input('exist_provider'));
             }
@@ -118,14 +126,12 @@ class OrderController extends Controller
                     if ($product) {
 
                         $product->label = $lineData['label'];
-                        $product->Qte += $lineData['quantity'];
 
                     } else {
 
                         $product = new Product();
                         $product->ref = $lineData['ref'];
                         $product->label = $lineData['label'];
-                        $product->Qte = $lineData['quantity'];
 
                     }
 
@@ -194,20 +200,18 @@ class OrderController extends Controller
         return redirect()->route('quotations.index');
     }
 
-    public function activate(Quotation $quotation)
+    public function changeStatus(Request $request)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $credit = new Credit();
-        $credit->total = $quotation->total;
-        $credit->quotation_id = $quotation->id;
-        $credit->save();
+        $order = Order::find($request->input('id'));
 
-        $quotation->is_active = 1;
-        $quotation->save();
+        $order->status = $request->input('status');
+
+        $order->save();
 
 
-        return redirect()->route('quotations.index');
+        return redirect()->route('orders.index');
     }
 
     public function update(Request $request, Order $order)

@@ -11,6 +11,7 @@ class QuotationLine extends Model
 
     protected $fillable = [
         'description',
+        'reference',
         'state',
         'type',
         'price',

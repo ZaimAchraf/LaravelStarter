@@ -22,6 +22,15 @@ class CreditController extends Controller
         return view('backOffice.credits.index', compact('credits'));
     }
 
+
+    public function payments(Credit $credit)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        return view('backOffice.credits.payments', compact('credit'));
+    }
+
+
     public function edit(Credit $credit)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');

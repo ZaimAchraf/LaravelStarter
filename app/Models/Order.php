@@ -25,4 +25,14 @@ class Order extends Model
         return $this->hasMany(OrderLine::class);
     }
 
+    public function deliveryNotes()
+    {
+        return $this->hasMany(DeliveryNote::class);
+    }
+
+    public function credit()
+    {
+        return $this->hasOne(SupplierCredit::class);
+    }
+
 }

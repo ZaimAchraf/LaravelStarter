@@ -57,7 +57,8 @@
                     <li><a><i class="fa fa-files-o"></i> DOCS Fournisseur<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{route('orders.index')}}">Liste des Commandes</a></li>
-                            <li><a href="#">Liste des Crédits</a></li>
+                            <li><a href="{{route('deliveryNotes.index')}}">Liste des BL</a></li>
+                            <li><a href="{{route('supplierCredits.index')}}">Liste des Crédits</a></li>
                             <li><a href="#">Liste des Factures</a></li>
                         </ul>
                     </li>

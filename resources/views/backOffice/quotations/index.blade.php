@@ -66,6 +66,7 @@
                                         <p class="text-muted font-13 m-b-30">
                                             Pour Ajouter un devis merci de cliquer sur l'icone : <i class="fa fa-plus-circle"></i> a droite du titre : "Liste des Devis" au-dessus.
                                             <br>
+                                            Pour Consulter le credit lie a un devis specifique merci de cliquer sur le montant de credit qui est en rouge.
                                         </p>
 
                                         <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
@@ -108,7 +109,7 @@
                                                                     OK
                                                                 </a>
                                                             @else
-                                                                <a href="{{ route('credits.index') }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
+                                                                <a href="{{ route('credits.payments', $quotation->credit) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="
                                                                 color: #ff2c2c !important;
                                                                 font-weight: bold;"
                                                                 >
@@ -165,18 +166,25 @@
                                                                         BL
                                                                     </button>
                                                                 </form>
-                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #002b8c;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
-
-                                                                        facture
-                                                                    </button>
-                                                                </form>
+                                                                @if($quotation->invoice == null)
+                                                                    <a href="{{ route('invoices.create', $quotation->id) }}"  class="text-white font-bold px-2 rounded mr-2" style="background: #002b8c;
+                                                                        line-height: 1;
+                                                                        padding: .4em .8em !important;
+                                                                        display: flex;
+                                                                        align-items: center"
+                                                                    >
+                                                                        Facture
+                                                                    </a>
+                                                                @else
+                                                                    <a href="{{ route('invoices.getPDF', $quotation->invoice) }}" target="_blank"  class="text-white font-bold px-2 rounded mr-2" style="background: #002b8c;
+                                                                        line-height: 1;
+                                                                        padding: .4em .8em !important;
+                                                                        display: flex;
+                                                                        align-items: center"
+                                                                    >
+                                                                        Facture
+                                                                    </a>
+                                                                @endif
                                                             @endif
 
                                                             <form class="d-inline m-0" action="{{ route('quotations.destroy', $quotation->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr?');">

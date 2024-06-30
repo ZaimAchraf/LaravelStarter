@@ -74,13 +74,11 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
 
-//        DB::beginTransaction();
+        DB::beginTransaction();
 //
-//        try {
+        try {
 
-            $this->validateInvoiceLines($request);
-
-
+//            $this->validateInvoiceLines($request);
 
             // Enregistrer le quotations avec ses lignes
             $invoice = Invoice::create([
@@ -96,11 +94,12 @@ class InvoiceController extends Controller
                     'price' => $lineData['price'],
                     'type' => $lineData['type'],
                     'TVA' => $lineData['TVA'] ?? 0,
+                    'reference' => $lineData['reference'] ?? null,
                     'quantity' => $lineData['quantity'] ?? 1,
-                    'state' => $lineData['state'] == 'null' ? null : $lineData['state'],
+                    'state' => $lineData['state'] ?? null
                 ]);
 
-                $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
+                $total += isset($lineData['quantity']) ? $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100)) : $lineData['price'] * (1 +($lineData['TVA']/100));
             }
 
             $invoice->total = $total;
@@ -109,24 +108,16 @@ class InvoiceController extends Controller
             Log::info('Données sauvegardées avec succès.');
             DB::commit();
 
-            // Redirection vers une page de confirmation ou de récapitulatif
             return redirect()->route('quotations.getPDF', $invoice->id);
 
-//        } catch (\Illuminate\Validation\ValidationException $e) {
-//            DB::rollback();
-//            return response()->json(['errors' => $e->errors()], 422);
-//        }
-//        }
-////        catch (\Exception $e) {
-////            // En cas d'erreur, annulez la transaction
-////            DB::rollBack();
-////
-////            // Log pour enregistrer l'erreur
-////            Log::error('Erreur lors du traitement: ' . $e->getMessage());
-////
-////            // Gérez l'erreur ou redirigez vers une page d'erreur
-////            return redirect()->back()->with('error_message', 'Erreur lors du traitement: ' . $e->getMessage());
-////        }
+        }
+        catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Erreur lors du traitement: ' . $e->getMessage());
+
+            return redirect()->back()->with('error_message', 'Erreur Technique lors du traitement.');
+        }
     }
 
     public function edit(Invoice $invoice)
@@ -140,7 +131,9 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $this->validateInvoiceLines($request);
+        DB::beginTransaction();
+
+//        $this->validateInvoiceLines($request);
 
         $invoice = Invoice::find($request->input('invoiceID'));
 
@@ -150,22 +143,25 @@ class InvoiceController extends Controller
             InvoiceLine::updateOrCreate([
                 'id' => $lineData['id']
             ],
-                [
-                    'invoice_id' => $request->input('invoiceID'),
-                    'description' => $lineData['description'],
-                    'price' => $lineData['price'],
-                    'TVA' => $lineData['TVA'] ?? 0,
-                    'quantity' => $lineData['quantity'] ?? 1,
-                    'state' => $lineData['state'],
-                    'type' => $lineData['type'],
-                ]);
+            [
+                'invoice_id' => $invoice->id,
+                'description' => $lineData['description'],
+                'price' => $lineData['price'],
+                'type' => $lineData['type'],
+                'TVA' => $lineData['TVA'] ?? 0,
+                'reference' => $lineData['reference'] ?? null,
+                'quantity' => $lineData['quantity'] ?? 1,
+                'state' => $lineData['state'] ?? null
+            ]);
 
-            $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
+            $total += isset($lineData['quantity']) ? $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100)) : $lineData['price'] * (1 +($lineData['TVA']/100));
         }
 
         $invoice->total = $total;
 
         $invoice->save();
+
+        DB::commit();
 
         return redirect()->back()->with('success', 'Facture a bien été modifiée !');
     }
@@ -173,8 +169,11 @@ class InvoiceController extends Controller
     public function deleteLine( Request $request )
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+//        return $request->input('line_id');
         $line = InvoiceLine::findOrFail($request->input('line_id'));
+        $price = isset($line->quantity) ? $line->price * $line->quantity * (1 +($line->TVA/100)) : $line->price * (1 +($line->TVA/100));
+        $line->invoice->total -= $price;
+        $line->invoice->save();
         $line->delete();
 
         return 'success';

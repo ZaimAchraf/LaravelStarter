@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->boolean('is_active')->default(0);
             $table->string('picture')->default('avatar.png');
-            $table->string('sexe');
+            $table->string('sexe')->default('H');
             $table->string('adresse')->nullable();
             $table->rememberToken();
             $table->foreignId('role_id')->constrained('roles');

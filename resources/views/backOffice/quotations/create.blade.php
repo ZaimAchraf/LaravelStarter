@@ -244,7 +244,7 @@
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <select name="lines[0][type]" id="type" class="form-control" >
+                                                <select name="lines[0][type]" id="type" class="form-control select-type" onChange="handleSelectChange(event)">
                                                     <option value="" selected disabled >Selectionner le type</option>
                                                     <option value="Produit" >Produit</option>
                                                     <option value="MOD">MOD</option>
@@ -252,42 +252,90 @@
                                             </div>
                                         </div>
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][description]"  placeholder="ex. PARE CHOC AV" />
+                                        <div class="product-fields" style="display: none;">
+
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Produit</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <select name="lines[0][exist_product]" class="form-control exist_product" >
+                                                        <option value="" selected disabled>Selectionner Produit</option>
+                                                        @foreach($products as $product)
+                                                            <option value="{{$product->id}}">
+                                                                {{$product->label . '-' . $product->ref}}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <p style="padding: 5px;">
+                                                        <input type="checkbox" name="lines[0][new_product]" id="new-product-check" value="Nouveau" class="flat" onChange="toggleNewProduct(event)"/> Nouveau Produit
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="new-product-form" style="display: none;">
+                                                <div class="field item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <input class="form-control" value="{{ old('label') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][label]"  placeholder="ex. PARE CHOC AV" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="field item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <select name="lines[0][state]" id="state" class="form-control" onChange="handleSelectState(event)">
+                                                            <option value="null" selected disabled>Selectionner l'état</option>
+                                                            <option value="Occasion" >Occasion</option>
+                                                            <option value="Nouveau">Neuf</option>
+                                                            <option value="Adaptable">Adaptable</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="field item form-group refInput" style="display: none;">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Référence</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <input type="text" value="{{ old('ref') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][ref]"  />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][quantity]"  />
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <select name="lines[0][state]" id="state" class="form-control" >
-                                                    <option value="null" selected disabled>Selectionner l'état</option>
-                                                    <option value="Occasion" >Occasion</option>
-                                                    <option value="Nouveau">Neuf</option>
-                                                    <option value="Adaptable">Adaptable</option>
-                                                </select>
+                                        <div class="mod-fields" style="display: none;">
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][description]"  placeholder="ex. MONTAGE DEMONTAGE" />
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][quantity]"  />
-                                            </div>
+
+
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
+                                        <div class="col-md-6 col-sm-6">
+                                            <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][price]"  placeholder="" />
                                         </div>
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][price]"  placeholder="" />
-                                            </div>
-                                        </div>
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][TVA]"  placeholder="" />
-                                            </div>
+                                    </div>
+
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
+                                        <div class="col-md-6 col-sm-6">
+                                            <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][TVA]"  placeholder="" />
                                         </div>
                                     </div>
                                 </div>
@@ -318,6 +366,52 @@
 
 
 @section("script")
+
+    <script>
+        function toggleNewProduct(event) {
+            let NewProductCheckbox = event.target;
+            let ligneDevis = $(NewProductCheckbox).closest('.ligneDevis');
+            let productForm = ligneDevis.find('.new-product-form');
+            let existProduct = ligneDevis.find('.exist_product');
+
+            if (NewProductCheckbox.checked) {
+                productForm.show();
+                existProduct.prop('disabled', true);
+            } else {
+                productForm.hide();
+                existProduct.prop('disabled', false);
+            }
+        }
+
+        function handleSelectState(event) {
+            let selectBox = event.target;
+            let ligneDevis = $(selectBox).closest('.ligneDevis');
+            let refInput = ligneDevis.find('.refInput');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Nouveau") {
+                refInput.show();
+            } else {
+                refInput.hide();
+            }
+        }
+
+        function handleSelectChange(event) {
+            let selectBox = event.target;
+            let ligneDevis = $(selectBox).closest('.ligneDevis');
+            let productFields = ligneDevis.find('.product-fields');
+            let modFields = ligneDevis.find('.mod-fields');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Produit") {
+                productFields.show();
+                modFields.hide();
+            } else {
+                productFields.hide();
+                modFields.show();
+            }
+        }
+    </script>
 
     <script>
         function deleteLine(event) {
@@ -351,7 +445,7 @@
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
                     <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][type]" id="type" class="form-control" >
+                        <select name="lines[${linesNumber}][type]" id="type" class="form-control select-type" onChange="handleSelectChange(event)">
                             <option value="" selected disabled>Selectionner le type</option>
                             <option value="Produit" >Produit</option>
                             <option value="MOD">MOD</option>
@@ -359,38 +453,81 @@
                     </div>
                 </div>
 
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
-                    <div class="col-md-6 col-sm-6">
-                        <input class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. PARE CHOC AV" />
+                <div class="product-fields" style="display: none;">
+
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Produit</label>
+                        <div class="col-md-6 col-sm-6">
+                            <select name="lines[${linesNumber}][exist_product]" class="form-control exist_product" >
+                                <option value="" selected disabled>Selectionner Produit</option>
+                                @foreach($products as $product)
+                                    <option value="{{$product->id}}">{{$product->label . '-' . $product->ref}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                        <div class="col-md-6 col-sm-6">
+                            <p style="padding: 5px;">
+                                <input type="checkbox" name="lines[${linesNumber}][new_product]" id="new-product-check" value="Nouveau" class="flat" onChange="toggleNewProduct(event)"/> Nouveau Produit
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="new-product-form" style="display: none;">
+                        <div class="field item form-group">
+                            <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                            <div class="col-md-6 col-sm-6">
+                                <input class="form-control" value="{{ old('label') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][label]"  placeholder="ex. PARE CHOC AV" />
+                            </div>
+                        </div>
+
+                        <div class="field item form-group">
+                            <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
+                            <div class="col-md-6 col-sm-6">
+                                <select name="lines[${linesNumber}][state]" id="state" class="form-control" onChange="handleSelectState(event)">
+                                    <option value="null" selected disabled>Selectionner l'état</option>
+                                    <option value="Occasion" >Occasion</option>
+                                    <option value="Nouveau">Neuf</option>
+                                    <option value="Adaptable">Adaptable</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field item form-group refInput" style="display: none;">
+                            <label class="col-form-label col-md-3 col-sm-3  label-align">Référence</label>
+                            <div class="col-md-6 col-sm-6">
+                                <input type="text" value="{{ old('ref') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][ref]"  />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
+                        <div class="col-md-6 col-sm-6">
+                            <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
+                        </div>
                     </div>
                 </div>
 
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                    <div class="col-md-6 col-sm-6">
-                        <select name="lines[0][state]" id="state" class="form-control" >
-                            <option value="null" selected disabled>Selectionner l'état</option>
-                            <option value="Occasion" >Occasion</option>
-                            <option value="Nouveau">Neuf</option>
-                            <option value="Adaptable">Adaptable</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
-                    <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
+                <div class="mod-fields" style="display: none;">
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                        <div class="col-md-6 col-sm-6">
+                            <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. MONTAGE DEMONTAGE" />
+                        </div>
                     </div>
                 </div>
 
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
                     <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
+                        <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
                     </div>
                 </div>
+
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
                     <div class="col-md-6 col-sm-6">

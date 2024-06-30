@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("phone");
-            $table->string("ICE");
+            $table->string("ICE")->nullable();
             $table->string("entreprise_yn")->default('0');
             $table->string("driver_name")->nullable();
             $table->foreignId('user_id')->constrained('users');

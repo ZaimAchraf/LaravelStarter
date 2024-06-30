@@ -71,7 +71,7 @@
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Titre</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ old('title') }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
+                                        <input class="form-control" value="{{ $quotation->title }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
                                         <hr>
                                     </div>
                                 </div>
@@ -82,39 +82,43 @@
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <select name="lines[{{$i}}][type]" id="type" class="form-control" >
-                                                    <option value="null" {{ $ql->type == null ? 'selected' : '' }} disabled >Selectionner le type</option>
-                                                    <option value="Produit" {{ $ql->type == 'Product' ? 'selected' : '' }}>Produit</option>
-                                                    <option value="MOD" {{ $ql->type == 'MOD' ? 'selected' : '' }}>MOD</option>
-                                                </select>
+                                                <input readonly class="form-control" value="{{ $ql->type }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][type]" />
                                             </div>
                                         </div>
 
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <input class="form-control" value="{{ $ql->description }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][description]"  placeholder="ex. PARE CHOC AV" />
+                                                <input readonly class="form-control" value="{{ $ql->description }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][description]"  placeholder="ex. PARE CHOC AV" />
                                             </div>
                                         </div>
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <select name="lines[{{$i}}][state]" id="state" class="form-control" >
-                                                    <option value="null" {{ $ql->state == null ? 'selected' : '' }}>Selectionner l'état</option>
-                                                    <option value="Occasion" {{ $ql->state == 'Occasion' ? 'selected' : '' }}>Occasion</option>
-                                                    <option value="Nouveau" {{ $ql->state == 'Nouveau' ? 'selected' : '' }}>Neuf</option>
-                                                    <option value="Adaptable" {{ $ql->state == 'Adaptable' ? 'selected' : '' }}>Adaptable</option>
-                                                </select>
+                                        @if($ql->type != 'MOD')
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input readonly class="form-control" value="{{ $ql->state }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][state]"  />
+                                                </div>
                                             </div>
-                                        </div>
+                                            @if($ql->reference)
+                                                <div class="field item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Reference</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <input readonly class="form-control" value="{{ $ql->reference }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][reference]"  />
+                                                    </div>
+                                                </div>
+                                            @endif
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ $ql->quantity }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][quantity]"  />
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input type="text" value="{{ $ql->quantity }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][quantity]"  />
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
+
+
+
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
                                             <div class="col-md-6 col-sm-6">
@@ -137,12 +141,12 @@
                                     @endforeach
                                 </div>
 
-                                <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
-                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">
-                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
-                                    </div>
-                                </div>
+{{--                                <div class="field item form-group">--}}
+{{--                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
+{{--                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">--}}
+{{--                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">

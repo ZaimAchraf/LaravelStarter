@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->string('status')->default('En cours');
+            $table->string('status')->default('In progress');
             $table->foreignId('provider_id')->constrained('providers');
             $table->timestamps();
         });

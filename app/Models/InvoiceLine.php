@@ -11,6 +11,7 @@ class InvoiceLine extends Model
 
     protected $fillable = [
         'description',
+        'reference',
         'state',
         'type',
         'price',

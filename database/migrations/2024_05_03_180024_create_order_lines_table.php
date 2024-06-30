@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('order_lines', function (Blueprint $table) {
             $table->id();
-            $table->integer('Qte');
+            $table->integer('Qte')->default(0);
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('order_id')->constrained('orders');
             $table->timestamps();

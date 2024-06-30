@@ -183,7 +183,7 @@
                     },
                     success: function(response) {
                         // Suppression réussie, vous pouvez mettre à jour l'interface si nécessaire
-                        $(".order-line:eq(" + index + ")").remove();
+                        window.location.reload();
                     },
                     error: function(xhr, status, error) {
                         console.error(error);

@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('invoice_lines', function (Blueprint $table) {
             $table->id();
             $table->string("description");
+            $table->string("reference")->nullable();
             $table->integer("quantity");
             $table->string("type");
             $table->double("price");
             $table->integer("TVA")->default(0);
-            $table->string("state");
+            $table->string("state")->nullable();
             $table->foreignId('invoice_id')->constrained('invoices');
             $table->timestamps();
         });

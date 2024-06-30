@@ -4,22 +4,75 @@
     <meta charset="UTF-8">
     <title>Devis {{$invoice->quotation->client->name}}</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
-        .invoice-box { max-width: 800px; margin: auto; padding: 10px; border: 1px solid #eee; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .logo img { max-width: 180px; }
-        .company-details { text-align: center; margin-bottom: 20px; }
-        .info-table, .items-table, .totals-table { width: 100%; border-collapse: collapse; margin-bottom: 30px}
-        .info-table th, .info-table td, .items-table th, .items-table td, .totals-table th, .totals-table td { border: 1px solid #ddd; padding: 5px; }
-        .info-table th { background-color: #f2f2f2; text-align: left; }
-        .info-table td { text-align: left; }
-        .items-table th { background-color: #f2f2f2; text-align: left; }
-        .totals-table { margin-top: 20px; }
-        .totals-table th { background-color: #f2f2f2; text-align: right; }
-        .totals-table td { text-align: right; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .footer { text-align: center; margin-top: 20px; font-size: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .company-details {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .info-table, .items-table, .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px
+        }
+        .info-table th, .info-table td,  .totals-table th, .totals-table td {
+            border: none;
+            /*border: 1px solid #ddd;*/
+            padding: 5px;
+        }
+        .items-table th, .items-table td {
+            border-right: 1px solid #818181;
+            border-left: 1px solid #818181;
+            padding: 5px;
+        }
+        .info-table th {
+            /*background-color: #d1d1d1;*/
+            text-align: left;
+        }
+        .info-table td {
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #d1d1d1;
+            text-align: left;
+        }
+        .totals-table {
+            margin-top: -17px;
+        }
+        .totals-table th {
+            border: none;
+            /*background-color: #d1d1d1;*/
+            text-align: right;
+        }
+        .totals-table td {
+            border: none;
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +105,7 @@
 
     <table class="items-table">
         <tr>
+            <th>Nature</th>
             <th>Description</th>
             <th>QTE</th>
             <th>P.U</th>
@@ -60,34 +114,93 @@
             <th>Montant (TTC)</th>
         </tr>
         @foreach($invoice->invoiceLines as $line)
-            <tr>
-                <td>{{$line->description}}</td>
-                <td>{{$line->quantity}}</td>
-                <td>{{$line->price}}</td>
-                <td>{{$line->price * $line->quantity}}</td>
-                <td>{{$line->TVA}}%</td>
-                <td>{{$line->price * $line->quantity * (1 + ($line->TVA/100))}}</td>
-            </tr>
-            <?php
-                $totalHT += $line->price * $line->quantity;
-                $totalTTC += $line->price * $line->quantity * (1 + ($line->TVA/100));
-            ?>
+            @if($line->type != 'MOD')
+                <tr>
+                    <td><b>{{$line->state}}</b></td>
+                    <td><b>{{$line->description}}</b></td>
+                    <td><b>{{$line->quantity}}</b></td>
+                    <td><b>{{number_format($line->price, 2)}}</b></td>
+                    <td><b>{{number_format($line->price * $line->quantity, 2)}}</b></td>
+                    <td><b>{{$line->TVA ? $line->TVA . '%' : '' }}</b></td>
+                    <td><b>{{$line->TVA ?  number_format($line->price * $line->quantity * (1 + ($line->TVA/100)), 2) : '' }}</b></td>
+                </tr>
+                    <?php
+                    $totalHT += $line->price * $line->quantity;
+                    $totalTTC += $line->price * $line->quantity * (1 + ($line->TVA/100));
+                    ?>
+            @endif
+        @endforeach
+        <tr style="margin-top: 40px !important;">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr style="margin-top: 40px !important;">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr style="margin-top: 40px !important;">
+            <td></td>
+            <td><u>{{strtoupper($invoice->title)}}  :</u></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        @foreach($invoice->invoiceLines as $line)
+            @if($line->type == 'MOD')
+                    <?php
+                    $price_ttc = $line->price * (1 + ($line->TVA/100));
+                    ?>
+                <tr>
+                    <td><b>{{$line->state}}</b></td>
+                    <td><b>{{$line->description}}</b></td>
+                    <td><b>{{$line->quantity}}</b></td>
+                    <td><b></b></td>
+                    <td><b>{{number_format($line->price, 2)}}</b></td>
+                    <td><b>{{$line->TVA}}%</b></td>
+                    <td><b>{{ number_format($price_ttc, 2)}}</b></td>
+                </tr>
+                    <?php
+                    $totalHT += $line->price ;
+                    $totalTTC += $line->price *  (1 + ($line->TVA/100));
+                    ?>
+            @endif
         @endforeach
     </table>
 
-    <div class="totals" style="display: flex; justify-content: space-between">
-        <table class="totals-table" style="width: 50% !important;" >
+    <div class="totals" style="display: flex; justify-content: end">
+        <table class="totals-table" style="width: 100% !important;" >
             <tr>
-                <th>Total HT</th>
-                <td>{{$totalHT}}</td>
+                <th style="width: 80% !important;">Total HT :</th>
+                <td><b>{{$totalHT}} DH</b></td>
             </tr>
             <tr>
-                <th>Total TTC</th>
-                <td>{{$totalTTC}}</td>
+                <th>Total TTC :</th>
+                <td><b>{{$totalTTC}} DH</b></td>
             </tr>
         </table>
     </div>
 
+    <div>
+        Arrêté le présent devis à la somme de :
+    </div>
+    <div>
+        @php
+            $nombreEntier = intval($totalTTC);
+        @endphp
+        <b>@numToWords($nombreEntier)</b>
+    </div>
     <div class="footer">
         <div class="company-details">
             <p>AutoBody Repair s.a.l. Address: N 322, Lot Ennamae QI, Bensouda FES</p>

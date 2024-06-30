@@ -21,4 +21,9 @@ class Credit extends Model
         return $this->belongsTo(Quotation::class);
     }
 
+    public function lines()
+    {
+        return $this->hasMany(CreditLine::class);
+    }
+
 }

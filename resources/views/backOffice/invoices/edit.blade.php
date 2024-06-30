@@ -60,73 +60,78 @@
 
                                 <div id="lignesDevis">
                                     @foreach($invoice->invoiceLines as $i => $line)
-                                        <div class="invoiceLine {{$i != 0 ? 'invoiceLine-new' : ''}}">
-                                            <input type="hidden" value="{{ $line->id }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][id]" />
+                                        <input type="hidden" value="{{ $line->id }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][id]" />
+
+
+                                        <div class="invoiceLine">
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input readonly class="form-control" value="{{ $line->type }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][type]" />
+                                                </div>
+                                            </div>
 
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <input class="form-control" value="{{ $line->description }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][description]"  />
+                                                    <input readonly class="form-control" value="{{ $line->description }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][description]"  placeholder="ex. PARE CHOC AV" />
                                                 </div>
                                             </div>
 
-                                            <div class="field item form-group">
-                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
-                                                <div class="col-md-6 col-sm-6">
-                                                    <select name="lines[{{$i}}][type]" id="type" class="form-control">
-                                                        <option value="null" {{ $line->type == null ? 'selected' : '' }}>Selectionner le type</option>
-                                                        <option value="Product" {{ $line->type == 'Product' ? 'selected' : '' }}>Produit</option>
-                                                        <option value="MOD" {{ $line->type == 'MOD' ? 'selected' : '' }}>MOD</option>
-                                                    </select>
+                                            @if($line->type != 'MOD')
+                                                <div class="field item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <input readonly class="form-control" value="{{ $line->state }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][state]"  />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                @if($line->reference)
+                                                    <div class="field item form-group">
+                                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Reference</label>
+                                                        <div class="col-md-6 col-sm-6">
+                                                            <input readonly class="form-control" value="{{ $line->reference }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][reference]"  />
+                                                        </div>
+                                                    </div>
+                                                @endif
 
-                                            <div class="field item form-group">
-                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                                                <div class="col-md-6 col-sm-6">
-                                                    <select name="lines[{{$i}}][state]" id="state" class="form-control">
-                                                        <option value="null" {{ $line->state == null ? 'selected' : '' }}>Selectionner l'état</option>
-                                                        <option value="Occasion" {{ $line->state == 'Occasion' ? 'selected' : '' }}>Occasion</option>
-                                                        <option value="Nouveau" {{ $line->state == 'Nouveau' ? 'selected' : '' }}>Neuf</option>
-                                                        <option value="Adaptable" {{ $line->state == 'Adaptable' ? 'selected' : '' }}>Adaptable</option>
-                                                    </select>
+                                                <div class="field item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
+                                                    <div class="col-md-6 col-sm-6">
+                                                        <input type="text" value="{{ $line->quantity }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][quantity]"  />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
 
-                                            <div class="field item form-group">
-                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Quantité</label>
-                                                <div class="col-md-6 col-sm-6">
-                                                    <input type="text" value="{{ $line->quantity }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][quantity]" />
-                                                </div>
-                                            </div>
+
+
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <input type="text" value="{{ $line->price }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][price]" />
+                                                    <input type="text" value="{{ $line->price }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][price]"  placeholder="" />
                                                 </div>
                                             </div>
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <input type="text" value="{{ $line->TVA }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][TVA]" />
+                                                    <input type="text" value="{{ $line->TVA }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][TVA]"  placeholder="" />
                                                 </div>
                                             </div>
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
                                                 <div class="col-md-6 col-sm-6 d-flex ">
-                                                    <button type="button" class="btn btn-danger" onclick="deleteLineBackend(event, {{ $i }})"><i class="fa fa-trash-o"></i></button>
+                                                    <button type="button" class="btn btn-danger deleteLineBtn" onclick="deleteLineBackend(event, {{$i}})"><i class="fa fa-trash-o"></i></button>
                                                 </div>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
 
-                                <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
-                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">
-                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
-                                    </div>
-                                </div>
+{{--                                <div class="field item form-group">--}}
+{{--                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
+{{--                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">--}}
+{{--                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">
