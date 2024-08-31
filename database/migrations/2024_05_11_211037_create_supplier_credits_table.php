@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('comment')->nullable();
             $table->double('paid')->default(0);
+            $table->double('total')->default(0);
             $table->string('status')->default('active');
             $table->foreignId('order_id')->constrained('orders');
             $table->timestamps();

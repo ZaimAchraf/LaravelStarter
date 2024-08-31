@@ -604,7 +604,7 @@
             vehiclesData.forEach(function(vehicle) {
                 var option = document.createElement('option');
                 option.value = vehicle.id; // Assurez-vous que vous avez un attribut id pour chaque véhicule
-                option.text = vehicle.label; // Changer cela selon la structure de vos données de véhicule
+                option.text = vehicle.label + '_' + vehicle.registration; // Changer cela selon la structure de vos données de véhicule
                 vehiclesSelect.appendChild(option);
             });
         });
