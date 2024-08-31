@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helper\UploadController;
+use App\Http\Controllers\Helper\ValidationHelper;
 use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Employee;
@@ -42,44 +44,6 @@ class QuotationController extends Controller
         return view('backOffice.quotations.create', compact('clients', 'products'));
     }
 
-    private function validateNewClient(Request $request)
-    {
-        return $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
-        ], [
-            'name.required' => 'Le nom du client est requis.',
-            'phone.required' => 'Le numéro Telephone est requis.',
-        ]);
-    }
-
-    private function validateNewClientEntreprise(Request $request)
-    {
-        return $request->validate([
-            'nom_entreprise' => 'required|string|max:255',
-            'ICE' => 'required|string|max:255',
-            'phone_contact' => 'required|string|max:255',
-        ], [
-            'nom_entreprise.required' => 'Le nom de l\'entreprise est requis.',
-            'ICE.required' => 'Le numéro ICE est requis.',
-            'phone_contact.required' => 'Le téléphone de contact est requis.',
-        ]);
-    }
-
-    private function validateNewUser(Request $request)
-    {
-        return $request->validate([
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ], [
-            'username.unique' => 'Le nom d\'utilisateur est déjà utilisé.',
-            'email.unique' => 'L\'adresse email est déjà utilisée.',
-            'password.require' => 'le mot de passe est obligatoire pour creer un compte.',
-            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.'
-        ]);
-    }
-
     private function validateQuotationLines(Request $request)
     {
         return $request->validate([
@@ -109,16 +73,22 @@ class QuotationController extends Controller
 
         try {
             if ($request->has('new_client')) {
+
                 if($request->has('nom_entreprise')  && $request->input('nom_entreprise')) {
-                    $this->validateNewClientEntreprise($request);
+
+                    ValidationHelper::validateEntrepriseClient($request, null);
+
                     $client = Client::Create([
                         'name' => $request->input('nom_entreprise'),
                         'ICE' => $request->input('ICE'),
                         'phone' => $request->input('phone_contact'),
                         'entreprise_yn' => '1',
                     ]);
-                }else{
-                    $this->validateNewClient($request);
+
+                } else {
+
+                    ValidationHelper::validateSimpleClient($request);
+
                     $client = Client::Create([
                         'name' => $request->input('name'),
                         'phone' => $request->input('phone'),
@@ -126,7 +96,9 @@ class QuotationController extends Controller
                 }
 
                 if ($request->has('nouveau_compte')) {
-                    $this->validateNewUser($request);
+
+                    ValidationHelper::validateNewUser($request);
+
                     $user = User::create([
                         'name' => $request->input('name'),
                         'phone' => $request->input('phone'),
@@ -137,6 +109,7 @@ class QuotationController extends Controller
                         'password' => Hash::make($request->input('password')),
                         'adresse' => $request->input('adresse'),
                     ]);
+
                     $client->user_id = $user->id;
                     $client->save();
                 }
@@ -264,6 +237,24 @@ class QuotationController extends Controller
 
         $pdf = new Dompdf();
         $pdf->loadHtml(view('backOffice.quotations.pdf', ['quotation' => $quotation]));
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $pdf->setOptions($options);
+
+        $pdf->render();
+        return  $pdf->stream(null, ['Attachment' => false]);
+    }
+
+    public function getBL($idQuotation) {
+
+        $quotation = Quotation::find($idQuotation);
+
+//        return view('backOffice.quotations.pdf', ['quotation' => $quotation]);
+
+        $pdf = new Dompdf();
+        $pdf->loadHtml(view('backOffice.delivery_notes.pdf', ['quotation' => $quotation]));
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);

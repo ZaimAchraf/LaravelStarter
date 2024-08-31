@@ -30,18 +30,23 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/dashboard/counts', [DashboardController::class, 'getCounts']);
+    Route::get('/api/dashboard/quotations-by-month', [DashboardController::class, 'getQuotationsByMonth']);
+
     Route::resource('users', \App\Http\Controllers\UserController::class);
     Route::post('/users/{user}', [\App\Http\Controllers\UserController::class, 'enable_disable'])->name('users.enable_disable');
 
     Route::get('/employees', [\App\Http\Controllers\EmployeeController::class, 'index'])->name('employees.index');
 
     Route::get('quotations/getPDF/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getPDF'])->name('quotations.getPDF');
+    Route::get('quotations/getBL/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getBL'])->name('quotations.getBL');
     Route::post('/quotations/deleteLine', [\App\Http\Controllers\QuotationController::class, 'deleteLine'])->name('quotations.delete_line');
     Route::resource('quotations', \App\Http\Controllers\QuotationController::class);
     Route::post('/quotations/{quotation}', [\App\Http\Controllers\QuotationController::class, 'activate'])->name('quotations.activate');
 
     Route::resource('/credits', \App\Http\Controllers\CreditController::class);
     Route::get('/credits/{credit}/payments', [\App\Http\Controllers\CreditController::class, 'payments'])->name('credits.payments');
+    Route::get('/credits/clients/nonPaid', [\App\Http\Controllers\CreditController::class, 'nonPaid'])->name('credits.nonPaid');
 
     Route::get('/invoices/create/{quotation}', [\App\Http\Controllers\InvoiceController::class, 'create'])->name('invoices.create');
     Route::post('/invoices', [\App\Http\Controllers\InvoiceController::class, 'store'])->name('invoices.store');
@@ -64,5 +69,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::resource('/supplierCredits', \App\Http\Controllers\SupplierCreditController::class);
     Route::get('/supplierCredits/{supplierCredit}/payments', [\App\Http\Controllers\SupplierCreditController::class, 'payments'])->name('supplierCredits.payments');
+    Route::get('/credits/suppliers/nonPaid', [\App\Http\Controllers\SupplierCreditController::class, 'nonPaid'])->name('supplierCredits.nonPaid');
+
+
+    Route::resource('/products', \App\Http\Controllers\ProductController::class);
+    Route::resource('/providers', \App\Http\Controllers\ProviderController::class);
+    Route::resource('/clients', \App\Http\Controllers\ClientController::class);
+
 });
 

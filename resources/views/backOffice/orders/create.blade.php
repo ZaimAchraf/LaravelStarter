@@ -217,7 +217,7 @@
                     <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
                     <div class="col-md-6 col-sm-6">
                         <p style="padding: 5px;">
-                            <input type="checkbox" name="[${linesNumber}][new_product]" id="new-product-check" value="new_product" class="flat new-product-check" /> Nouveau produit
+                            <input type="checkbox" name="lines[${linesNumber}][new_product]" id="new-product-check" value="new_product" class="flat new-product-check" /> Nouveau produit
                         </p>
                     </div>
                 </div>

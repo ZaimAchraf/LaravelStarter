@@ -79,6 +79,7 @@ class DeliveryNoteController extends Controller
             $deliveryNote = DeliveryNote::create( [
                 'order_id' => $request->input('order'),
                 'title' => $request->input('title'),
+                'total' => $request->input('total'),
                 'document' => $document ?? null
             ]);
 
@@ -98,6 +99,7 @@ class DeliveryNoteController extends Controller
                     $orderLine = OrderLine::find($lineData['id']);
 
                     $sum = 0;
+                    $total = 0;
                     foreach ($order->deliveryNotes as $dn) {
                         foreach ($dn->deliveryNoteLines as $dnl) {
                             if ($orderLine->product->id == $dnl->product_id) {
@@ -130,10 +132,12 @@ class DeliveryNoteController extends Controller
                 $credit = new SupplierCredit();
                 $credit->title = $order->title;
                 $credit->order_id = $order->id;
-                $credit->save();
+            }else {
+                $credit = $order->credit;
             }
 
-
+            $credit->total += $request->input('total');
+            $credit->save();
 
             Log::info('Données sauvegardées avec succès.');
             DB::commit();
@@ -154,6 +158,8 @@ class DeliveryNoteController extends Controller
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $deliveryNote = DeliveryNote::find($request->input('id'));
+        $deliveryNote->order->credit->total -= $deliveryNote->total;
+        $deliveryNote->order->credit->save();
         $deliveryNote->deliveryNoteLines()->delete();
         $deliveryNote->delete();
 

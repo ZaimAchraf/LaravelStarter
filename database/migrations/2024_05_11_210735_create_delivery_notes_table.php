@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('delivery_notes', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
+            $table->double('total')->nullable();
             $table->string('document')->nullable();
             $table->foreignId('order_id')->constrained('orders');
             $table->timestamps();

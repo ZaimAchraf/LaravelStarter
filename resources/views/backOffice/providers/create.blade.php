@@ -1,0 +1,149 @@
+@extends("backOffice.layout.panel")
+
+
+@section("title","Ajouter Fournisseur")
+
+@section("style_links")
+@endsection
+
+@section("style")
+@endsection
+
+
+
+
+@section("content-wrapper")
+
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Ajouter Fournisseur</h3>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger alert-dismissible" role="alert" id="myAlert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        {{ $error }}
+                    </div>
+                @endforeach
+            @endif
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <form method="post" action="{{ route('providers.store') }}" enctype="multipart/form-data">
+                                @csrf
+                                <div class="provider-infos">
+                                    <span class="section">Informations Founisseur</span>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Nom Complet</label>
+                                        <div class="col-md-6 col-sm-6">
+                                            <input class="form-control" value="{{ old('name') }}" data-validate-length-range="6" data-validate-words="2" name="name"  placeholder="ex. John f. Kennedy"  />
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Telephone</label>
+                                        <div class="col-md-6 col-sm-6">
+                                            <input type="text" class="form-control" value="{{ old('phone') }}" data-validate-length-range="6" data-validate-words="2" name="phone"  placeholder="ex. 0606060606"  />
+                                        </div>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                        <div class="col-md-6 col-sm-6">
+                                            <p style="padding: 5px;">
+                                                <input type="checkbox" name="nouveau_compte" id="addAccountCheckbox" value="new_account" data-parsley-mincheck="2" class="flat" /> Ajouter un compte pour ce fournisseur
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="user-infos" style="display: none;">
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Nom  d'utilisateur</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="text" value="{{ old('username') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="username"   />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Email</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="email" value="{{ old('email') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="email"  placeholder="ex. exemple@exemple.com"  />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Password</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="password" class="form-control" data-validate-length-range="6" data-validate-words="2" name="password" placeholder="********"  />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Confirmer Password</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="password" class="form-control" data-validate-length-range="6" data-validate-words="2" name="password_confirmation" placeholder="********"  />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Adresse</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="text" value="{{ old('adresse') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="adresse"  placeholder=""  />
+                                            </div>
+                                        </div>
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Gendre</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <select name="gendre" id="gendre" class="form-control" >
+                                                    <option value="H" selected>Homme</option>
+                                                    <option value="F">Femme</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="ln_solid mt-1">
+                                    <div class="form-group">
+                                        <div class="col-md-6 offset-md-3  pt-2">
+                                            <button type='submit' class="btn btn-primary">Submit</button>
+                                            <a href="{{route('providers.index')}}" class="btn btn-secondary">Annuler</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+@section("script")
+
+
+    <script>
+        function toggleUserInfos() {
+            var checkbox = document.getElementById('addAccountCheckbox');
+            var userInfosDiv = document.querySelector('.user-infos');
+
+            if (checkbox.checked) {
+                userInfosDiv.style.display = 'block';
+            } else {
+                userInfosDiv.style.display = 'none';
+            }
+        }
+
+        var checkbox = document.getElementById('addAccountCheckbox');
+        checkbox.addEventListener('change', toggleUserInfos);
+
+        toggleUserInfos();
+    </script>
+
+
+@endsection

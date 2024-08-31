@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Devis {{$invoice->quotation->client->name}}</title>
+    <title>Facture {{$invoice->quotation->client->name}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,22 +83,34 @@
     <?php $totalHT = 0;$totalTTC = 0; ?>
     <table class="info-table">
         <tr>
+            <th>Facture N°</th>
+            <td>{{$invoice->number}}</td>
             <th>Date</th>
-            <td>{{$invoice->created_at}}</td>
-            <th>Client</th>
-            <td>{{($invoice->quotation->client->user ? (($invoice->quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $invoice->quotation->client->name}}</td>
+            <td>
+                @php
+                    $date = substr($invoice->created_at, 0, 10);
+                @endphp
+                {{$date}}
+            </td>
         </tr>
         <tr>
             <th>Vehicule</th>
             <td>{{$invoice->quotation->vehicle->label}}</td>
-            <th>Assurance</th>
-            <td>{{$invoice->quotation->vehicle->insurance}}</td>
+            <th>Client</th>
+            <td>{{($invoice->quotation->client->user ? (($invoice->quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $invoice->quotation->client->name}}</td>
+
         </tr>
         <tr>
             <th>Chassis No</th>
             <td>{{$invoice->quotation->vehicle->chassis_number}}</td>
             <th>Immatricule</th>
             <td>{{$invoice->quotation->vehicle->registration}}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <td></td>
+            <th>Assurance</th>
+            <td>{{$invoice->quotation->vehicle->insurance}}</td>
         </tr>
         <!-- Additional rows as needed -->
     </table>
@@ -193,7 +205,7 @@
     </div>
 
     <div>
-        Arrêté le présent devis à la somme de :
+        Arrêtée à la somme de :
     </div>
     <div>
         @php

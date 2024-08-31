@@ -38,7 +38,8 @@
                         <ul class="nav child_menu">
                             <li><a href="{{route('users.index')}}">Liste des Utilisateurs</a></li>
                             <li><a href="{{route('employees.index')}}">Liste des Fonctionnaires</a></li>
-                            <li><a href="{{route('employees.index')}}">Liste des Clients</a></li>
+                            <li><a href="{{route('providers.index')}}">Liste des Fournisseurs</a></li>
+                            <li><a href="{{route('clients.index')}}">Liste des Client</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -61,6 +62,14 @@
                             <li><a href="{{route('supplierCredits.index')}}">Liste des Crédits</a></li>
                             <li><a href="#">Liste des Factures</a></li>
                         </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav side-menu">
+                    <li>
+                        <a href="{{route('products.index')}}">
+                            <i class="fa fa-product-hunt"></i> Liste des produits
+                        </a>
                     </li>
                 </ul>
             </div>

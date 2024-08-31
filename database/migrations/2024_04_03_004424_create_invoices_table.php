@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->string('number')->unique();
             $table->string('title')->nullable();
+            $table->string('yearly_counter')->nullable();
             $table->foreignId('quotation_id')->constrained('quotations');
             $table->double('total')->nullable();
             $table->timestamps();

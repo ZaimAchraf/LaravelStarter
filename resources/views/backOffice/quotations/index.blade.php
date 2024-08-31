@@ -154,18 +154,15 @@
                                                                     </button>
                                                                 </form>
                                                             @else
-                                                                <form class="d-inline m-0" action="{{ route('quotations.activate', $quotation->id) }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #006244;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
 
-                                                                        BL
-                                                                    </button>
-                                                                </form>
+                                                                <a href="{{ route('quotations.getBL', $quotation) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #006244;
+                                                                    line-height: 1;
+                                                                    padding: .4em .8em !important;
+                                                                    display: flex;
+                                                                    align-items: center"
+                                                                >
+                                                                    BL
+                                                                </a>
                                                                 @if($quotation->invoice == null)
                                                                     <a href="{{ route('invoices.create', $quotation->id) }}"  class="text-white font-bold px-2 rounded mr-2" style="background: #002b8c;
                                                                         line-height: 1;

@@ -108,7 +108,7 @@ class InvoiceController extends Controller
             Log::info('Données sauvegardées avec succès.');
             DB::commit();
 
-            return redirect()->route('quotations.getPDF', $invoice->id);
+            return redirect()->route('invoices.getPDF', $invoice->id);
 
         }
         catch (\Exception $e) {

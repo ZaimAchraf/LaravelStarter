@@ -11,6 +11,12 @@ class Provider extends Model
 
     protected $fillable = [
         'name',
-        'phone'
+        'phone',
+        'user_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

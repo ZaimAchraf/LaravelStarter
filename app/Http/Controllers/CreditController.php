@@ -22,6 +22,15 @@ class CreditController extends Controller
         return view('backOffice.credits.index', compact('credits'));
     }
 
+    public function nonPaid()
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $credits = Credit::whereColumn('total', '<>', 'paid')->get();
+
+        return view('backOffice.credits.non_paid_credits', compact('credits'));
+    }
+
 
     public function payments(Credit $credit)
     {

@@ -61,7 +61,7 @@
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">
                                         <p class="text-muted font-13 m-b-30">
-                                            Pour creer un paiement merci de le faire dans la pages des <a href="{{route('supplierCredits.index')}}">credits</a> en cliquant sur <i class="fa fa-eye"></i> dans la ligne liée au credit payé.
+                                            Pour creer un paiement merci de le faire dans la pages des <a href="{{route('supplierCredits.index')}}">credits</a> en cliquant sur <i class="fa fa-pencil"></i> dans la ligne liée au credit payé.
                                             <br>
                                         </p>
 

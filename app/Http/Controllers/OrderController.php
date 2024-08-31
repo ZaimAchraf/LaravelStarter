@@ -71,14 +71,14 @@ class OrderController extends Controller
         return view('backOffice.orders.edit', compact('order', 'products'));
     }
 
-    private function validateOrderLines(Request $request)
+    private function validateOrderLines(Request $request, $index)
     {
         return $request->validate([
-            'lines.*.label' => 'required|string|max:255',
-            'lines.*.ref' => 'string|unique:products',
+            'lines.' . $index . '.label' => 'required|string|max:255',
+            'lines.' . $index . '.ref' => 'string|unique:products,ref',
         ], [
-            'lines.*.label.required' => 'La description de la ligne de commande est requise.',
-            'lines.*.ref.unique' => 'La reference de la ligne de commande doit être unique.',
+            'lines.' . $index . '.label.required' => 'La description de la ligne de commande est requise.',
+            'lines.' . $index . '.ref.unique' => 'La reference de la ligne de commande doit être unique.',
         ]);
     }
 
@@ -86,9 +86,9 @@ class OrderController extends Controller
     public function store(Request $request)
     {
 
-//        DB::beginTransaction();
+        DB::beginTransaction();
 //
-//        try {
+        try {
 
 
             if ($request->has('new_provider')) {
@@ -115,11 +115,11 @@ class OrderController extends Controller
                 'title' => $request->input('title'),
             ]);
 
-            foreach ($request->input('lines') as $lineData) {
+            foreach ($request->input('lines') as $index => $lineData) {
 
-                if ($lineData['new_product']) {
+                if (isset($lineData['new_product'])) {
 
-                    $this->validateOrderLines($request);
+                    $this->validateOrderLines($request, $index);
 
                     $product = Product::find($lineData['ref']);
 
@@ -132,7 +132,6 @@ class OrderController extends Controller
                         $product = new Product();
                         $product->ref = $lineData['ref'];
                         $product->label = $lineData['label'];
-
                     }
 
                     $product->save();
@@ -153,23 +152,21 @@ class OrderController extends Controller
             DB::commit();
 
             // Redirection vers une page de confirmation ou de récapitulatif
-            return redirect()->route('quotations.getPDF', $order->id);
+            return redirect()->route('orders.index');
 
 //        } catch (\Illuminate\Validation\ValidationException $e) {
 //            DB::rollback();
 //            return response()->json(['errors' => $e->errors()], 422);
 //        }
-//        }
-//        catch (\Exception $e) {
-//            // En cas d'erreur, annulez la transaction
-//            DB::rollBack();
-//
-//            // Log pour enregistrer l'erreur
-//            Log::error('Erreur lors du traitement: ' . $e->getMessage());
-//
-//            // Gérez l'erreur ou redirigez vers une page d'erreur
-//            return redirect()->back()->with('error_message', 'Erreur lors du traitement: ' . $e->getMessage());
-//        }
+        }
+        catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error('Erreur lors du traitement: ' . $e->getMessage());
+
+            return redirect()->back()->withErrors(['error', 'Erreur technique lors du traitement ' . $e->getMessage()]);
+        }
     }
 
     public function getPDF($idQuotation) {
@@ -190,14 +187,14 @@ class OrderController extends Controller
         return  $pdf->stream(null, ['Attachment' => false]);
     }
 
-    public function destroy(Quotation $quotation)
+    public function destroy(Order $order)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $quotation->quotationLines()->delete();
-        $quotation->delete();
+        $order->orderLines()->delete();
+        $order->delete();
 
-        return redirect()->route('quotations.index');
+        return redirect()->route('orders.index');
     }
 
     public function changeStatus(Request $request)

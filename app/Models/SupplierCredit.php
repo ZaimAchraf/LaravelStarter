@@ -12,6 +12,7 @@ class SupplierCredit extends Model
     protected $fillable = [
         'order_id',
         'title',
+        'total',
         'paid',
         'status',
         'comment',

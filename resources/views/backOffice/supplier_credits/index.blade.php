@@ -61,7 +61,9 @@
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">
                                         <p class="text-muted font-13 m-b-30">
-                                            Les Crédits sont créés automatiquement après la creation des BL.
+                                            Les Crédits sont créés automatiquement après la creation des BL. </br>
+                                            Pour creer un paiement merci de le faire en cliquant sur <i class="fa fa-pencil"></i> dans la ligne liée au credit payé.
+
                                             <br>
                                         </p>
 
@@ -71,6 +73,7 @@
                                                 <th>#</th>
                                                 <th>Title</th>
                                                 <th>Nom Fournisseur</th>
+                                                <th>Total</th>
                                                 <th>Payé</th>
                                                 <th>Statut</th>
                                                 <th>Action</th>
@@ -86,7 +89,10 @@
                                                         {{ $credit->title }}
                                                     </td>
                                                     <td>
-                                                        {{ $credit->deliveryNote->order->provider->name }}
+                                                        {{ $credit->order->provider->name }}
+                                                    </td>
+                                                    <td>
+                                                        <b style="color: #0b3d6e">{{ $credit->total }} DH</b>
                                                     </td>
                                                     <td>
                                                         <b style="color: #35ff20">{{ $credit->paid }} DH</b>

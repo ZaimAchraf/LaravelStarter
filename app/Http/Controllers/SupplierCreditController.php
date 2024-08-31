@@ -24,6 +24,15 @@ class SupplierCreditController extends Controller
         return view('backOffice.supplier_credits.index', compact('credits'));
     }
 
+    public function nonPaid()
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $credits = SupplierCredit::whereColumn('total', '<>', 'paid')->get();
+
+        return view('backOffice.supplier_credits.non_paid_credits', compact('credits'));
+    }
+
     public function edit(SupplierCredit $supplierCredit)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -44,6 +53,10 @@ class SupplierCreditController extends Controller
 
         $creditData = $request->validated();
 
+        if($supplierCredit->total < ($supplierCredit->paid + $creditData["paid"])) {
+            return back()->withErrors(['error' => 'Vous avez depasse le montant total du credit. Merci de verifier les infos inseree et ressayer.']);
+        }
+
         $creditLine = new SupplierCreditLine();
         $creditLine->amount = $creditData["paid"];
         $creditLine->comment = $creditData["comment"];
@@ -56,6 +69,8 @@ class SupplierCreditController extends Controller
         $creditLine->save();
 
         $supplierCredit->paid += $creditLine->amount;
+
+        $supplierCredit->status = $supplierCredit->paid == $supplierCredit->total ? 'paid' : 'active';
 
         $supplierCredit->save();
 

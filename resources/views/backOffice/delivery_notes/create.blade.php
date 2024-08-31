@@ -67,6 +67,13 @@
                                         <hr>
                                     </div>
                                 </div>
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Total</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" value="0" data-validate-length-range="6" data-validate-words="2" name="total"/>
+                                        <hr>
+                                    </div>
+                                </div>
 
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Etat de la commande</label>
@@ -76,7 +83,6 @@
                                             <option value="In progress" >En cours</option>
                                             <option value="Delivered" >Delivrée</option>
                                             <option value="Skipped" >Annulée</option>
-
                                         </select>
                                     </div>
                                 </div>
@@ -87,6 +93,8 @@
                                         <input id="document" type="file" name="documents" multiple>
                                     </div>
                                 </div>
+
+                                <hr>
 
                                 <div id="delivery-note-lines">
                                     @foreach($order->orderLines as $i => $ol)

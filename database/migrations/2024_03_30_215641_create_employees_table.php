@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('fonction');
             $table->string('Salaire')->nullable();
             $table->string('statut')->default('OK');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

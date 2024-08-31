@@ -12,6 +12,7 @@ class DeliveryNote extends Model
     protected $fillable = [
         'order_id',
         'title',
+        'total',
         'document',
     ];
 

@@ -83,26 +83,34 @@
     <?php $totalHT = 0;$totalTTC = 0; ?>
     <table class="info-table">
         <tr>
+            <th>Devis N° :</th>
+            <td>{{$quotation->id}}</td>
             <th>Date :</th>
             <td>
             @php
                 $date = substr($quotation->created_at, 0, 10);
             @endphp
-                {{$date}}</td>
-            <th>Client :</th>
-            <td>{{($quotation->client->user ? (($quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $quotation->client->name}}</td>
+                {{$date}}
+            </td>
+
         </tr>
         <tr>
             <th>Vehicule :</th>
             <td>{{$quotation->vehicle->label}}</td>
-            <th>Assurance :</th>
-            <td>{{$quotation->vehicle->insurance}}</td>
+            <th>Client :</th>
+            <td>{{($quotation->client->user ? (($quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $quotation->client->name}}</td>
         </tr>
         <tr>
             <th>Chassis No :</th>
             <td>{{$quotation->vehicle->chassis_number}}</td>
             <th>Immatricule :</th>
             <td>{{$quotation->vehicle->registration}}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <td></td>
+            <th>Assurance :</th>
+            <td>{{$quotation->vehicle->insurance}}</td>
         </tr>
         <!-- Additional rows as needed -->
     </table>
