@@ -7,6 +7,7 @@ use App\Http\Controllers\Helper\ValidationHelper;
 use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Employee;
+use App\Models\Folder;
 use App\Models\Product;
 use App\Models\Provider;
 use App\Models\Quotation;
@@ -22,48 +23,40 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-class QuotationController extends Controller
+class FolderController extends Controller
 {
 
     public function index()
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $quotations = Quotation::all();
-        return view('backOffice.quotations.index', compact('quotations'));
+        $folders = Folder::all();
+        return view('backOffice.folders.index', compact('folders'));
     }
-
-
 
     public function create()
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $clients = Client::all();
-        $products = Product::where('Qte', '>', 0)->get();
-        $providers = Provider::all();
 
-        return view('backOffice.quotations.create', compact('clients', 'products', 'providers'));
+        return view('backOffice.folders.create', compact('clients'));
     }
 
-    private function validateQuotationLines(Request $request)
-    {
-        return $request->validate([
-            'lines.*.price' => 'required|numeric|min:0',
-        ], [
-            'lines.*.price.required' => 'Le prix de la ligne de quotations est requis.',
-            'lines.*.price.numeric' => 'Le prix de la ligne de quotations doit être un nombre.',
-            'lines.*.price.min' => 'Le prix de la ligne de quotations doit être supérieur à 0.',
-        ]);
-    }
-
-    public function edit(Quotation $quotation)
+    public function show(Folder $folder)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $products = Product::where('Qte', '>', 0)->get();
-        $providers = Provider::all();
-        return view('backOffice.quotations.edit', compact('quotation', 'products', 'providers'));
+        return $folder;
+
+//        return view('backOffice.folders.edit', compact('folder'));
+    }
+
+    public function edit(Folder $folder)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        return view('backOffice.folders.edit', compact('folder'));
     }
 
 
@@ -147,112 +140,18 @@ class QuotationController extends Controller
                 $vehicle = Vehicle::find($request->input('exist_vehicle'));
             }
 
-//            $this->validateQuotationLines($request);
-
-
-
-            // Enregistrer le quotations avec ses lignes
-            $quotation = Quotation::create([
+            $folder = Folder::create([
                 'client_id' => $client->id,
                 'vehicle_id' => $vehicle->id,
                 'title' => $request->input('title'),
             ]);
 
-            $total = 0;
+            $folder->save();
 
-            foreach ($request->input('lines') as $index => $lineData) {
-                $quotationLine = new QuotationLine();
-
-
-                $quotationLine->price = $lineData['price'];
-                $quotationLine->TVA = $lineData['TVA'];
-                $quotationLine->type = $lineData['type'];
-                $quotationLine->quotation_id = $quotation->id;
-
-                if ($lineData['type'] == 'Produit')
-                {
-                    $quotationLine->quantity = $lineData['quantity'] ?? 1;
-
-                    if (isset($lineData['new_product']))
-                    {
-//                        return $request->input('lines');
-//                        $product = Product::Create([
-//                            'label' => $lineData['label'],
-//                            'ref' => $lineData['ref']
-//                        ]);
-
-                        $quotationLine->description = $lineData['label'];
-                        $quotationLine->state = $lineData['state'];
-                        $quotationLine->reference = $lineData['ref'];
-
-                    }else if (isset($lineData['exist_product'])){
-
-                        $product = Product::find($lineData['exist_product']);
-
-                        if (!$product) {
-                            return redirect()->back()->withErrors(['errors' => 'Le produit séléctionné n\'a pas été trouvé.']);
-                        }
-
-                        if ($product->Qte < ($lineData['quantity'] ?? 1)) {
-                            return 'error qte';
-                            return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
-                        }
-
-                        $quotationLine->description = $product->label;
-                        $quotationLine->state = $product->ref ? 'Nouveau' : 'Occasion';
-                        $quotationLine->reference = $product->ref;
-
-//                        $product->Qte -= ($lineData['quantity'] ?? 1);
-
-                        $product->save();
-                    }
-
-                    if (!isset($lineData['exist_provider'])) {
-
-                        ValidationHelper::validateNewProviderQuotation($request, $index);
-
-                        $provider = Provider::Create([
-                            'name' => $lineData['provider_name'],
-                            'phone' => $lineData['provider_phone']
-                        ]);
-
-                    } else {
-                        $request->validate([
-                            'lines.' . $index . '.exist_provider' => 'required|exists:providers,id',
-                        ], [
-                            'lines.' . $index . 'exist_provider.required' => 'Le choix du fournisseur est obligatoire dans la ligne ' . ($index + 1) . '.',
-                            'lines.' . $index . 'exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
-                        ]);
-                        $provider = Provider::find($lineData['exist_provider']);
-                    }
-
-                    $request->validate([
-                        'lines.' . $index . '.purchase_price' => 'required',
-                    ], [
-                        'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit>.',
-                    ]);
-
-                    $quotationLine->purchase_price = $lineData['purchase_price'];
-                    $quotationLine->provider_id = $provider->id;
-
-                }else {
-                    $quotationLine->description = $lineData['description'];
-                }
-
-                $quotationLine->save();
-
-                $total += $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100));
-            }
-
-            $quotation->total = $total;
-            $quotation->save();
-
-//            return $quotation->quotationLines;
-
-//            DB::rollBack();
             DB::commit();
+            return $folder;
             // Redirection vers une page de confirmation ou de récapitulatif
-            return redirect()->route('quotations.getPDF', $quotation->id);
+            return redirect()->route('folders.index');
 
 //        } catch (\Illuminate\Validation\ValidationException $e) {
 //            DB::rollback();
@@ -264,7 +163,6 @@ class QuotationController extends Controller
 
             Log::error('Erreur lors du traitement: ' . $e->getMessage());
 
-            // Gérez l'erreur ou redirigez vers une page d'erreur
             return redirect()->back()->withErrors(['error', 'Erreur lors du traitement: ' . $e->getMessage()]);
         }
     }

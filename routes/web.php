@@ -38,6 +38,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/employees', [\App\Http\Controllers\EmployeeController::class, 'index'])->name('employees.index');
 
+
+    Route::resource('folders', \App\Http\Controllers\FolderController::class);
+
     Route::get('quotations/getPDF/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getPDF'])->name('quotations.getPDF');
     Route::get('quotations/getBL/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getBL'])->name('quotations.getBL');
     Route::post('/quotations/deleteLine', [\App\Http\Controllers\QuotationController::class, 'deleteLine'])->name('quotations.delete_line');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helper\ValidationHelper;
 use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Employee;
@@ -43,17 +44,6 @@ class OrderController extends Controller
         return view('backOffice.orders.create', compact('providers', 'products'));
     }
 
-    private function validateNewProvider(Request $request)
-    {
-        return $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
-        ], [
-            'name.required' => 'Le nom du fournisseur est requis.',
-            'phone.required' => 'Le numéro Telephone est requis.',
-        ]);
-    }
-
     public function show(Order $order)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -93,7 +83,7 @@ class OrderController extends Controller
 
             if ($request->has('new_provider')) {
 
-                $this->validateNewProvider($request);
+                ValidationHelper::validateNewProvider($request);
 
                 $provider = Provider::Create([
                     'name' => $request->input('name'),

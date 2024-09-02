@@ -58,4 +58,26 @@ class ValidationHelper extends Controller
             'ref.unique' => 'Cette reference existe déjà dans la BD. La reference doit etre unique.',
         ]);
     }
+
+    public static function validateNewProvider(Request $request)
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:255',
+        ], [
+            'name.required' => 'Le nom du fournisseur est requis.',
+            'phone.required' => 'Le numéro Telephone est requis.',
+        ]);
+    }
+
+    public static function validateNewProviderQuotation(Request $request, $index)
+    {
+        return $request->validate([
+            'lines.' . $index . '.provider_name' => 'required|string|max:255',
+            'lines.' . $index . '.provider_phone' => 'required|string|max:255',
+        ], [
+            'lines.' . $index . '.provider_name.required' => 'Le nom du fournisseur est requis.',
+            'lines.' . $index . '.provider_phone.required' => 'Le numéro Telephone est requis.',
+        ]);
+    }
 }

@@ -16,11 +16,18 @@ class QuotationLine extends Model
         'type',
         'price',
         'TVA',
-        'quantity'
+        'quantity',
+        'provider_id',
+        'purchase_price'
     ];
 
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
     }
 }

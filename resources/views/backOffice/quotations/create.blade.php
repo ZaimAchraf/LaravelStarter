@@ -321,21 +321,71 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-
-
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
-                                        <div class="col-md-6 col-sm-6">
-                                            <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][price]"  placeholder="" />
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][price]"  placeholder="" />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
-                                        <div class="col-md-6 col-sm-6">
-                                            <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][TVA]"  placeholder="" />
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[0][TVA]"  placeholder="" />
+                                            </div>
+                                        </div>
+
+                                        <div class="provider-infos"  style="display: none;">
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <h4 class="text-center ">Infos Fournisseur</h4>
+                                                </div>
+                                            </div>
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Fournisseur</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <select name="lines[0][exist_provider]" id="exist_provider" class="form-control exist_provider" >
+                                                        <option value="" selected disabled>Selectionner Fournisseur</option>
+                                                        @foreach($providers as $provider)
+                                                            <option value="{{$provider->id}}">
+                                                                {{$provider->name}}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <p style="padding: 5px;">
+                                                        <input type="checkbox" name="lines[0][new_provider]" id="nouveau-provider-check" value="Nouveau" class="flat" onChange="toggleNewProvider(event)"/> Nouveau Fournisseur
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="new-provider-form" style="display: none;">
+                                                <div id="formProvider">
+                                                    <div class="field item form-group">
+                                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Nom </label>
+                                                        <div class="col-md-6 col-sm-6">
+                                                            <input class="form-control" value="{{ old('provider_name') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][provider_name]"  />
+                                                        </div>
+                                                    </div>
+                                                    <div class="field item form-group">
+                                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Telephone</label>
+                                                        <div class="col-md-6 col-sm-6">
+                                                            <input type="text" class="form-control" value="{{ old('provider_phone') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][provider_phone]"  placeholder="ex. 0606060606"  />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Prix d'Achat </label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input class="form-control" value="{{ old('purchase_price') }}" data-validate-length-range="6" data-validate-words="2" name="lines[0][purchase_price]"  />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -383,6 +433,21 @@
             }
         }
 
+        function toggleNewProvider(event) {
+            let NewProviderCheckbox = event.target;
+            let ligneDevis = $(NewProviderCheckbox).closest('.ligneDevis');
+            let providerForm = ligneDevis.find('.new-provider-form');
+            let existProvider = ligneDevis.find('.exist_provider');
+
+            if (NewProviderCheckbox.checked) {
+                providerForm.show();
+                existProvider.prop('disabled', true);
+            } else {
+                providerForm.hide();
+                existProvider.prop('disabled', false);
+            }
+        }
+
         function handleSelectState(event) {
             let selectBox = event.target;
             let ligneDevis = $(selectBox).closest('.ligneDevis');
@@ -400,14 +465,17 @@
             let selectBox = event.target;
             let ligneDevis = $(selectBox).closest('.ligneDevis');
             let productFields = ligneDevis.find('.product-fields');
+            let providerFields = ligneDevis.find('.provider-infos');
             let modFields = ligneDevis.find('.mod-fields');
             let selectedValue = selectBox.value;
 
             if (selectedValue === "Produit") {
                 productFields.show();
+                providerFields.show();
                 modFields.hide();
             } else {
                 productFields.hide();
+                providerFields.hide();
                 modFields.show();
             }
         }
@@ -532,6 +600,51 @@
                     <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
                     <div class="col-md-6 col-sm-6">
                         <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][TVA]"  placeholder="" />
+                    </div>
+                </div>
+                <div class="provider-infos" style="display: none;">
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Fournisseur</label>
+                        <div class="col-md-6 col-sm-6">
+                            <select name="lines[${linesNumber}][exist_provider]" id="exist_provider" class="form-control">
+                                <option value="" selected disabled>Selectionner Fournisseur</option>
+                                @foreach($providers as $provider)
+                                    <option value="{{$provider->id}}">
+                                        {{$provider->name}}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                        <div class="col-md-6 col-sm-6">
+                            <p style="padding: 5px;">
+                                <input type="checkbox" name="lines[${linesNumber}][new_provider]" id="nouveau-provider-check" value="Nouveau" class="flat" onChange="toggleNewProvider(event)"/> Nouveau Fournisseur
+                                </p>
+                        </div>
+                    </div>
+                    <div class="new-provider-form" style="display: none;">
+                        <div id="formPersonne">
+                            <div class="field item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3  label-align">Nom </label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input class="form-control" value="{{ old('provider_name') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][provider_name]"  />
+                                </div>
+                            </div>
+                            <div class="field item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3  label-align">Telephone</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="text" class="form-control" value="{{ old('provider_phone') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][provider_phone]"  placeholder="ex. 0606060606"  />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Prix d'Achat </label>
+                        <div class="col-md-6 col-sm-6">
+                            <input class="form-control" value="{{ old('purchase_price') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][purchase_price]"  />
+                        </div>
                     </div>
                 </div>
                 <div class="field item form-group">

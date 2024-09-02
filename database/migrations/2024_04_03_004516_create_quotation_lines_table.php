@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string("state")->nullable();
             $table->string("type");
             $table->foreignId('quotation_id')->constrained('quotations');
+            $table->double("purchase_price");
+            $table->foreignId('provider_id')->constrained('providers');
             $table->timestamps();
         });
     }
