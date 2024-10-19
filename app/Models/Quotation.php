@@ -10,10 +10,10 @@ class Quotation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'client_id',
-        'vehicle_id',
+        'folder_id',
         'total',
         'title',
+        'type',
         'is_active'
     ];
 
@@ -22,6 +22,11 @@ class Quotation extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function folder()
+    {
+        return $this->belongsTo(Folder::class);
     }
 
     public function vehicle()

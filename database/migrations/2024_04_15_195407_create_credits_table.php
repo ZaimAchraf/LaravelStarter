@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('total');
             $table->integer('paid')->default(0);
             $table->string('comment')->nullable();
-            $table->foreignId('quotation_id')->constrained('quotations');
+            $table->foreignId('folder_id')->constrained('folders');
             $table->timestamps();
         });
     }

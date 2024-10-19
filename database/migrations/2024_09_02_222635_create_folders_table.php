@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
+            $table->string('type')->default("service");
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('vehicle_id')->constrained('vehicles');
             $table->timestamps();

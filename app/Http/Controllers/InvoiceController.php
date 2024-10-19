@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\CProduct;
 use App\Models\Credit;
 use App\Models\Employee;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
+use App\Models\Product;
+use App\Models\Folder;
 use App\Models\Quotation;
 use App\Models\QuotationLine;
 use App\Models\User;
@@ -49,13 +52,14 @@ class InvoiceController extends Controller
         return  $pdf->stream(null, ['Attachment' => false]);
     }
 
-    public function create($quotationId)
+    public function create($folderID)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $quotation = Quotation::find($quotationId);
+        $folder = Folder::find($folderID);
+        $products = CProduct::all();
 
-        return view('backOffice.invoices.create', compact('quotation'));
+        return view('backOffice.invoices.create', compact('folder', 'products'));
     }
 
     private function validateInvoiceLines(Request $request)
@@ -75,6 +79,7 @@ class InvoiceController extends Controller
     {
 
         DB::beginTransaction();
+//        return $request->input('lines');
 //
         try {
 
@@ -82,19 +87,35 @@ class InvoiceController extends Controller
 
             // Enregistrer le quotations avec ses lignes
             $invoice = Invoice::create([
-                'quotation_id' => $request->input('quotation'),
+                'folder_id' => $request->input('folder'),
                 'title' => $request->input('title'),
             ]);
 
+//            return $request->input('lines');
+
             $total = 0;
             foreach ($request->input('lines') as $lineData) {
+
+                if ($lineData['type'] == 'Produit') {
+                    if (isset($lineData['exist_product'])) {
+
+                        $product = CProduct::find($lineData['exist_product']);
+                    }else {
+                        return redirect()->back()->withErrors(['error' => 'Il faut obligatoirement choisir un produit existant.']);
+                    }
+
+                    if ($product->Qte < $lineData['quantity']) {
+                        return redirect()->back()->withErrors(['error' => 'Le stock disponible ne permet pas l\'action courante pour le produit : ' . $product->label]);
+                    }
+                }
+
                 InvoiceLine::create([
                     'invoice_id' => $invoice->id,
-                    'description' => $lineData['description'],
+                    'description' => $lineData['description'] ?? $product->label,
                     'price' => $lineData['price'],
                     'type' => $lineData['type'],
                     'TVA' => $lineData['TVA'] ?? 0,
-                    'reference' => $lineData['reference'] ?? null,
+                    'reference' => $product->ref ?? null,
                     'quantity' => $lineData['quantity'] ?? 1,
                     'state' => $lineData['state'] ?? null
                 ]);
@@ -105,10 +126,12 @@ class InvoiceController extends Controller
             $invoice->total = $total;
             $invoice->save();
 
+//            return $invoice->invoiceLines;
+
             Log::info('Données sauvegardées avec succès.');
             DB::commit();
-
-            return redirect()->route('invoices.getPDF', $invoice->id);
+//            DB::rollBack();
+            return redirect()->route('folders.show', $invoice->folder)->with('success', 'Facture a bien été créée !');
 
         }
         catch (\Exception $e) {
@@ -116,7 +139,7 @@ class InvoiceController extends Controller
 
             Log::error('Erreur lors du traitement: ' . $e->getMessage());
 
-            return redirect()->back()->with('error_message', 'Erreur Technique lors du traitement.');
+            return redirect()->back()->withErrors(['error' => 'Erreur Technique lors du traitement.']);
         }
     }
 
@@ -186,6 +209,6 @@ class InvoiceController extends Controller
         $invoice->invoiceLines()->delete();
         $invoice->delete();
 
-        return redirect()->route('invoices.index');
+        return redirect()->back()->with('success', 'Facture a bien été suprimée !');
     }
 }

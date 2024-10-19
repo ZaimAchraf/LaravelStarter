@@ -12,6 +12,7 @@ class Folder extends Model
     protected $fillable = [
         'client_id',
         'vehicle_id',
+        'type',
         'title'
     ];
 
@@ -30,14 +31,14 @@ class Folder extends Model
         return $this->hasMany(FolderDocument::class);
     }
 
-    public function quotation()
+    public function quotations()
     {
-        return $this->hasOne(Quotation::class);
+        return $this->hasMany(Quotation::class);
     }
 
-    public function invoice()
+    public function invoices()
     {
-        return $this->hasOne(Invoice::class);
+        return $this->hasMany(Invoice::class);
     }
 
     public function credit()

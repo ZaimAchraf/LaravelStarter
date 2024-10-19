@@ -12,6 +12,7 @@ class FolderDocument extends Model
     protected $fillable = [
         'folder_id',
         'type',
+        'label',
         'name'
     ];
 

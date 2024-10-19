@@ -16,7 +16,7 @@
         <!-- footer content start -->
         <footer>
             <div class="pull-right">
-                Developped by <a href="https://zaimachraf.github.io/">Achraf</a>
+                Developped by <a href="https://zaimachraf.github.io/">Zaim Achraf</a>
             </div>
             <div class="clearfix"></div>
         </footer>

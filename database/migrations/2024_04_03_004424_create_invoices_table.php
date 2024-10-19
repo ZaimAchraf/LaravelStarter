@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('number')->unique();
             $table->string('title')->nullable();
             $table->string('yearly_counter')->nullable();
-            $table->foreignId('quotation_id')->constrained('quotations');
+            $table->foreignId('folder_id')->constrained('folders');
             $table->double('total')->nullable();
             $table->timestamps();
         });

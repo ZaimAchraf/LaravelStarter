@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->foreignId('client_id')->constrained('clients');
-            $table->foreignId('vehicle_id')->constrained('vehicles');
+            $table->foreignId('folder_id')->constrained('folders');
             $table->double('total')->nullable();
+            $table->double('type')->default('Initial');
             $table->boolean('is_active')->default(0);
             $table->timestamps();
         });

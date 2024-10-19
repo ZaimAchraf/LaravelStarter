@@ -50,6 +50,16 @@
                                         <hr>
                                     </div>
                                 </div>
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Type dossier</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <select name="type_folder" class="form-control" >
+                                            <option value="" selected disabled>Selectionner le type du dossier</option>
+                                            <option value="sinistre"  >sinistre</option>
+                                            <option value="service"  >service</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <span class="section">Informations Client</span>
 

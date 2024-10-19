@@ -10,15 +10,15 @@ class Credit extends Model
     use HasFactory;
 
     protected $fillable = [
-        'quotation_id',
+        'folder_id',
         'total',
         'paid',
         'comment',
     ];
 
-    public function quotation()
+    public function folder()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(Folder::class);
     }
 
     public function lines()

@@ -64,7 +64,18 @@
                         <div class="col-md-9 col-sm-9 ">
                             <canvas id="canvas_line_chart"></canvas>
                         </div>
-                        <div class="col-md-3 col-sm-12 ">
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="dashboard_graph">
+
+                        <div class="col-md-3 col-sm-12 mr-md-4">
                             <div>
                                 <div class="x_title">
                                     <h2>Anciens crédits clients</h2>
@@ -82,7 +93,7 @@
                                                 <i class="fa fa-user green"></i>
                                             </a>
                                             <div class="media-body">
-                                                <a class="title" href="#">{{$credit->quotation->client->name}}</a>
+                                                <a class="title" href="#">{{$credit->folder->client->name}}</a>
                                                 <p>Montant de : <strong style="color: #569a66"> {{$credit->total - $credit->paid}} DH </strong> </p>
                                                 <p>Depuis le : <small><b>{{$credit->created_at}}</b></small>
                                                 </p>
@@ -92,18 +103,7 @@
                                 </ul>
                             </div>
                         </div>
-
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 col-sm-12 ">
-                    <div class="dashboard_graph">
-
-                        <div class="col-md-3 col-sm-12 ">
+                        <div class="col-md-3 col-sm-12">
                             <div>
                                 <div class="x_title">
                                     <h2>Anciens crédits clients</h2>
@@ -121,7 +121,7 @@
                                                 <i class="fa fa-user red"></i>
                                             </a>
                                             <div class="media-body">
-                                                <a class="title" href="#">{{$credit->order->provider->name}}</a>
+                                                <a class="title" href="#">{{$credit->order->provider->name}} : ({{$credit->order->title}})</a>
                                                 <p>Montant de : <strong style="color: #cc4a61"> {{$credit->total - $credit->paid}} DH </strong> </p>
                                                 <p>Depuis le : <small><b>{{$credit->created_at}}</b></small>
                                                 </p>

@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('folder_documents', function (Blueprint $table) {
             $table->id();
             $table->string('type');
+            $table->string('label');
             $table->string('name');
             $table->foreignId('folder_id')->constrained('folders');
-            $table->boolean('is_active')->default(0);
             $table->timestamps();
         });
     }

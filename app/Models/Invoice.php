@@ -13,14 +13,14 @@ class Invoice extends Model
     protected $fillable = [
         'number',
         'total',
-        'quotation_id',
+        'folder_id',
         'title',
         'yearly_counter'
     ];
 
-    public function quotation()
+    public function folder()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(Folder::class);
     }
 
     public function invoiceLines()

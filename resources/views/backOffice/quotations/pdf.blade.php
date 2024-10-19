@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Devis {{$quotation->client->name}}</title>
+    <title>Devis {{$quotation->folder->client->name}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,21 +96,21 @@
         </tr>
         <tr>
             <th>Vehicule :</th>
-            <td>{{$quotation->vehicle->label}}</td>
+            <td>{{$quotation->folder->vehicle->label}}</td>
             <th>Client :</th>
-            <td>{{($quotation->client->user ? (($quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $quotation->client->name}}</td>
+            <td>{{($quotation->folder->client->user ? (($quotation->folder->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $quotation->folder->client->name}}</td>
         </tr>
         <tr>
             <th>Chassis No :</th>
-            <td>{{$quotation->vehicle->chassis_number}}</td>
+            <td>{{$quotation->folder->vehicle->chassis_number}}</td>
             <th>Immatricule :</th>
-            <td>{{$quotation->vehicle->registration}}</td>
+            <td>{{$quotation->folder->vehicle->registration}}</td>
         </tr>
         <tr>
             <th></th>
             <td></td>
             <th>Assurance :</th>
-            <td>{{$quotation->vehicle->insurance}}</td>
+            <td>{{$quotation->folder->vehicle->insurance}}</td>
         </tr>
         <!-- Additional rows as needed -->
     </table>

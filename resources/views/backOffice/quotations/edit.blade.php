@@ -40,22 +40,15 @@
                             <form method="post" action="{{ route('quotations.update', $quotation->id) }}" enctype="multipart/form-data">
                                 @method('PUT')
                                 @csrf
-{{--                                <span class="section">User Info</span>--}}
+
                                 <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Client</label>
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Titre Devis</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ $quotation->client->name }}" data-validate-length-range="6" data-validate-words="2" name="" disabled />
+                                        <input class="form-control" value="{{ $quotation->title }}" data-validate-length-range="6" data-validate-words="2" name="title"   />
                                     </div>
                                 </div>
 
-                                <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Véhicule</label>
-                                    <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ $quotation->vehicle->label }}" data-validate-length-range="6" data-validate-words="2" name=""  disabled />
-                                    </div>
-                                </div>
-
-                                <span class="section">Informations de Devis</span>
+                                <hr>
 
                                 <div id="lignesDevis">
                                     @foreach($quotation->quotationLines as $i => $ql)
@@ -154,7 +147,7 @@
                                     <div class="form-group">
                                         <div class="col-md-6 offset-md-3  pt-2">1`````````
                                             <button type='submit' class="btn btn-primary">Submit</button>
-                                            <a href="{{route('quotations.index')}}" class="btn btn-secondary">Annuler</a>
+                                            <a href="{{route('folders.show', $quotation->folder)}}" class="btn btn-secondary">Annuler</a>
                                         </div>
                                     </div>
                                 </div>

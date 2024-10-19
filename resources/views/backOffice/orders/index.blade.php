@@ -118,57 +118,61 @@
 
                                                             @if(!($order->status == 'Skipped'))
 
-                                                            <a href="{{ route('deliveryNotes.create', $order->id) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #017fc0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;
-                                                                    display: flex;
-                                                                    align-items: center"
-                                                            >
-                                                                BL
-                                                            </a>
-
-                                                            @if(!(isset($order->deliveryNotes) && $order->deliveryNotes->isNotEmpty()))
-                                                                <a href="{{ route('orders.edit', $order) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
+                                                                <a href="{{ route('deliveryNotes.create', $order->id) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #017fc0;
                                                                         line-height: 1;
                                                                         padding: .4em .8em !important;
                                                                         display: flex;
                                                                         align-items: center"
                                                                 >
-                                                                    <i class="fa fa-edit"></i>
+                                                                    BL
                                                                 </a>
-                                                            @else
-                                                                <form class="d-inline m-0" action="{{ route('orders.change_status') }}" method="POST">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <input type="hidden" name="id" value="{{ $order->id }}">
-                                                                    <input type="hidden" name="status" value="Delivered">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                    <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                            style="background: #156b19;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
 
-                                                                        <i class="fa fa-check"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endif
+                                                                @if(!(isset($order->deliveryNotes) && $order->deliveryNotes->isNotEmpty()))
+                                                                    <a href="{{ route('orders.edit', $order) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
+                                                                            line-height: 1;
+                                                                            padding: .4em .8em !important;
+                                                                            display: flex;
+                                                                            align-items: center"
+                                                                    >
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                @else
+                                                                    @if(!($order->status == 'Delivered'))
+                                                                        <form class="d-inline m-0" action="{{ route('orders.change_status') }}" method="POST">
+                                                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                                            <input type="hidden" name="id" value="{{ $order->id }}">
+                                                                            <input type="hidden" name="status" value="Delivered">
+                                                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                                            <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
+                                                                                    style="background: #156b19;
+                                                                            border: none;
+                                                                            margin: 0;
+                                                                            line-height: 1;
+                                                                            padding: .4em .8em !important;">
 
-                                                            <form class="d-inline m-0" action="{{ route('orders.change_status') }}" method="POST" onsubmit="return confirm('Êtes-vous sûr que vous voulez annulé la demande?\nCette operation est irreductible!');">
-                                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                <input type="hidden" name="id" value="{{ $order->id }}">
-                                                                <input type="hidden" name="status" value="Skipped">
-                                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                                <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
-                                                                        style="background: #651526;
-                                                                    border: none;
-                                                                    margin: 0;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;">
+                                                                                <i class="fa fa-check"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    @endif
+                                                                @endif
 
-                                                                    <i class="fa fa-close"></i>
-                                                                </button>
-                                                            </form>
+                                                                @if(!($order->status == 'Delivered'))
+                                                                    <form class="d-inline m-0" action="{{ route('orders.change_status') }}" method="POST" onsubmit="return confirm('Êtes-vous sûr que vous voulez annulé la demande?\nCette operation est irreductible!');">
+                                                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                                        <input type="hidden" name="id" value="{{ $order->id }}">
+                                                                        <input type="hidden" name="status" value="Skipped">
+                                                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                                        <button type="submit" class="text-white font-bold py-1 px-2 rounded mr-2"
+                                                                                style="background: #651526;
+                                                                            border: none;
+                                                                            margin: 0;
+                                                                            line-height: 1;
+                                                                            padding: .4em .8em !important;">
+
+                                                                            <i class="fa fa-close"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
 
                                                             @endif
 

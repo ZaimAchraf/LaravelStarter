@@ -44,13 +44,31 @@
                     </li>
                 </ul>
 
+{{--                <ul class="nav side-menu">--}}
+{{--                    <li><a><i class="fa fa-files-o"></i> DOCS Clients <span class="fa fa-chevron-down"></span></a>--}}
+{{--                        <ul class="nav child_menu">--}}
+{{--                            <li><a href="{{route('quotations.index')}}">Liste des Devis</a></li>--}}
+{{--                            <li><a href="{{route('credits.index')}}">Liste des Crédits</a></li>--}}
+{{--                            <li><a href="{{route('invoices.index')}}">Liste des Factures</a></li>--}}
+{{--                        </ul>--}}
+{{--                    </li>--}}
+{{--                </ul>--}}
+
                 <ul class="nav side-menu">
-                    <li><a><i class="fa fa-files-o"></i> DOCS Clients <span class="fa fa-chevron-down"></span></a>
+                    <li><a><i class="fa fa-files-o"></i> Dossiers Clients <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="{{route('quotations.index')}}">Liste des Devis</a></li>
-                            <li><a href="{{route('credits.index')}}">Liste des Crédits</a></li>
-                            <li><a href="{{route('invoices.index')}}">Liste des Factures</a></li>
+                            <li><a href="{{route('folders.index')}}">Tous les dossiers</a></li>
+                            <li><a href="{{route('folders.foldersType', 'sinistre')}}">Dossiers Sinistre</a></li>
+                            <li><a href="{{route('folders.foldersType', 'service')}}">Dossiers Service</a></li>
                         </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav side-menu">
+                    <li>
+                        <a href="{{route('aggregatedInvoices.index')}}">
+                            <i class="fa fa-file-archive-o"></i> Factures Aggrégée
+                        </a>
                     </li>
                 </ul>
 
@@ -60,7 +78,16 @@
                             <li><a href="{{route('orders.index')}}">Liste des Commandes</a></li>
                             <li><a href="{{route('deliveryNotes.index')}}">Liste des BL</a></li>
                             <li><a href="{{route('supplierCredits.index')}}">Liste des Crédits</a></li>
-                            <li><a href="#">Liste des Factures</a></li>
+{{--                            <li><a href="#">Liste des Factures</a></li>--}}
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav side-menu">
+                    <li><a><i class="fa fa-files-o"></i> Comptabilité <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="{{route('accountants.invoices')}}">Factures Achats</a></li>
+                            <li><a href="{{route('accountants.products')}}">Stock</a></li>
                         </ul>
                     </li>
                 </ul>

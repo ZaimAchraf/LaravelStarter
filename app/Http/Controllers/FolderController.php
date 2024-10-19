@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Employee;
 use App\Models\Folder;
+use App\Models\FolderDocument;
 use App\Models\Product;
 use App\Models\Provider;
 use App\Models\Quotation;
@@ -34,6 +35,15 @@ class FolderController extends Controller
         return view('backOffice.folders.index', compact('folders'));
     }
 
+    public function foldersType(String $type)
+    {
+        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $folders = Folder::where('type', $type)->get();
+//        return $type;
+        return view('backOffice.folders.index', compact('folders'));
+    }
+
     public function create()
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -47,9 +57,21 @@ class FolderController extends Controller
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return $folder;
+        $steps = [
+            'Documents véhicule' => $folder->documents->where('type', 'DV')->count() > 0,
+            'Documents assurance' => $folder->documents->where('type', 'DA')->count() > 0,
+            'Images avant' => $folder->documents->where('type', 'IMG_AV')->count() > 0,
+            'Images en cours' => $folder->documents->where('type', 'IMG_EC')->count() > 0,
+            'Images après' => $folder->documents->where('type', 'IMG_AP')->count() > 0,
+            'Devis confirmés' => $folder->quotations->where('type', 'accorde')->count() > 0,
+            'Facture' => $folder->invoices->count() > 0 // Assumer qu'il y a une relation invoices avec le folder
+        ];
 
-//        return view('backOffice.folders.edit', compact('folder'));
+        $totalSteps = count($steps);
+        $completedSteps = count(array_filter($steps));
+        $progress = ($completedSteps / $totalSteps) * 100;
+
+        return view('backOffice.folders.show', compact('folder', 'steps', 'progress'));
     }
 
     public function edit(Folder $folder)
@@ -68,6 +90,13 @@ class FolderController extends Controller
         DB::beginTransaction();
 
         try {
+
+            $request->validate([
+                'type_folder' => 'required|string|max:255'
+            ], [
+                'label.required' => 'Le champ type dossier est requis.'
+            ]);
+
             if ($request->has('new_client')) {
 
                 if($request->has('nom_entreprise')  && $request->input('nom_entreprise')) {
@@ -144,14 +173,15 @@ class FolderController extends Controller
                 'client_id' => $client->id,
                 'vehicle_id' => $vehicle->id,
                 'title' => $request->input('title'),
+                'type_folder' => $request->input('type'),
             ]);
 
             $folder->save();
 
             DB::commit();
-            return $folder;
+//            return $folder;
             // Redirection vers une page de confirmation ou de récapitulatif
-            return redirect()->route('folders.index');
+            return redirect()->route('folders.show', $folder);
 
 //        } catch (\Illuminate\Validation\ValidationException $e) {
 //            DB::rollback();
@@ -167,229 +197,145 @@ class FolderController extends Controller
         }
     }
 
-    public function getPDF($idQuotation) {
-
-        $quotation = Quotation::find($idQuotation);
-
-//        return view('backOffice.quotations.pdf', ['quotation' => $quotation]);
-
-        $pdf = new Dompdf();
-        $pdf->loadHtml(view('backOffice.quotations.pdf', ['quotation' => $quotation]));
-
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $pdf->setOptions($options);
-
-        $pdf->render();
-        return  $pdf->stream(null, ['Attachment' => false]);
-    }
-
-    public function getBL($idQuotation) {
-
-        $quotation = Quotation::find($idQuotation);
-
-//        return view('backOffice.quotations.pdf', ['quotation' => $quotation]);
-
-        $pdf = new Dompdf();
-        $pdf->loadHtml(view('backOffice.delivery_notes.pdf', ['quotation' => $quotation]));
-
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $pdf->setOptions($options);
-
-        $pdf->render();
-        return  $pdf->stream(null, ['Attachment' => false]);
-    }
-
-    public function destroy(Quotation $quotation)
+    public function destroy(Folder $folder)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $quotation->quotationLines()->delete();
-        $quotation->delete();
-
-        return redirect()->route('quotations.index');
-    }
-
-    public function activate(Quotation $quotation)
-    {
-        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $credit = new Credit();
-        $credit->total = $quotation->total;
-        $credit->quotation_id = $quotation->id;
-        $credit->save();
-
-        $quotation->is_active = 1;
-        $quotation->save();
-
-
-        return redirect()->route('quotations.index');
-    }
-
-    public function update(Request $request, Quotation $quotation)
-    {
-        abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-//        $this->validateQuotationLines($request);
         DB::beginTransaction();
 
         try {
-            $total = 0;
-            foreach ($request->input('lines') as $index => $lineData) {
+            DB::beginTransaction();
 
-    //            QuotationLine::updateOrCreate([
-    //                'id' => $lineData['id']
-    //            ],
-    //            [
-    //                'quotation_id' => $quotation->id,
-    //                'description' => $lineData['description'],
-    //                'price' => $lineData['price'],
-    //                'TVA' => $lineData['TVA'] ?? 0,
-    //                'quantity' => $lineData['quantity'] ?? 1,
-    //                'state' => $lineData['state'] == 'null' ? null : $lineData['state'],
-    //            ]);
+            if ($folder->quotations()->count() == 0) {
+                $folder->documents()->delete();
+                $folder->delete();
 
-                if (isset($lineData['id'])) {
-                    $ql = QuotationLine::find($lineData['id']);
-                    if (!$ql) return  back()->withErrors(['error' => 'Aucune ligne de devis avec l\'id : ' . $lineData['id']]);
-
-                    $ql->price = $lineData['price'];
-                    $ql->TVA = $lineData['TVA'];
-
-                    if ($ql->type != 'MOD') $ql->quantity = $lineData['quantity'];
-
-                    $ql->save();
-                }else {
-                    $quotationLine = new QuotationLine();
-
-
-                    $quotationLine->price = $lineData['price'];
-                    $quotationLine->TVA = $lineData['TVA'];
-                    $quotationLine->type = $lineData['type'];
-                    $quotationLine->quotation_id = $quotation->id;
-
-                    if ($lineData['type'] == 'Produit')
-                    {
-                        $quotationLine->quantity = $lineData['quantity'] ?? 1;
-
-                        if (isset($lineData['new_product']))
-                        {
-//                        return $request->input('lines');
-//                        $product = Product::Create([
-//                            'label' => $lineData['label'],
-//                            'ref' => $lineData['ref']
-//                        ]);
-
-                            $quotationLine->description = $lineData['label'];
-                            $quotationLine->state = $lineData['state'];
-                            $quotationLine->reference = $lineData['ref'];
-
-                        }else if (isset($lineData['exist_product'])){
-
-                            $product = Product::find($lineData['exist_product']);
-
-                            if (!$product) {
-                                return redirect()->back()->withErrors(['errors' => 'Le produit séléctionné n\'a pas été trouvé.']);
-                            }
-
-                            if ($product->Qte < ($lineData['quantity'] ?? 1)) {
-                                return 'error qte';
-                                return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
-                            }
-
-                            $quotationLine->description = $product->label;
-                            $quotationLine->state = $product->ref ? 'Nouveau' : 'Occasion';
-                            $quotationLine->reference = $product->ref;
-
-//                            $product->Qte -= ($lineData['quantity'] ?? 1);
-
-                            $product->save();
-                        }
-
-                        if (!isset($lineData['exist_provider'])) {
-
-                            ValidationHelper::validateNewProviderQuotation($request, $index);
-
-                            $provider = Provider::Create([
-                                'name' => $lineData['provider_name'],
-                                'phone' => $lineData['provider_phone']
-                            ]);
-
-                        } else {
-                            $request->validate([
-                                'lines.' . $index . '.exist_provider' => 'required|exists:providers,id',
-                            ], [
-                                'lines.' . $index . 'exist_provider.required' => 'Le choix du fournisseur est obligatoire dans la ligne ' . ($index + 1) . '.',
-                                'lines.' . $index . 'exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
-                            ]);
-                            $provider = Provider::find($lineData['exist_provider']);
-                        }
-
-                        $request->validate([
-                            'lines.' . $index . '.purchase_price' => 'required',
-                        ], [
-                            'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit>.',
-                        ]);
-
-                        $quotationLine->purchase_price = $lineData['purchase_price'];
-                        $quotationLine->provider_id = $provider->id;
-
-                    }else {
-                        $quotationLine->description = $lineData['description'];
-                    }
-
-                    $quotationLine->save();
-                }
-
-                $total += isset($lineData['quantity']) ? $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100)) : $lineData['price']  * (1 +($lineData['TVA']/100));
+            } else {
+                return redirect()->back()->withErrors(['error' => 'Pas possible de supprimer les dossiers contenant des devis']);
             }
-
-            $quotation->total = $total;
-
-            if ($quotation->credit) {
-                $quotation->credit->total = $total;
-                $quotation->credit->save();
-            }
-
-            $quotation->save();
 
             DB::commit();
+            return redirect()->back()->with('info', 'Dossier supprimé avec succès');
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-            return redirect()->back()->with('success', 'Devis bien modifié !');
+            Log::error('Erreur lors du traitement: ' . $e->getMessage());
+
+            return redirect()->back()->withErrors(['error' => 'Erreur lors du traitement: ' . $e->getMessage()]);
+        }
+
+    }
+
+
+    public function updatePurchases(Request $request)
+    {
+
+//        return $request;
+
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($request->input('lines') as $index => $lineData) {
+                $quotationLine = QuotationLine::find($lineData['ql']);
+
+                if (!isset($lineData['exist_provider'])) {
+
+                    if ($lineData['provider_name']) {
+                        ValidationHelper::validateNewProviderQuotation($request, $index);
+                        $provider = Provider::Create([
+                            'name' => $lineData['provider_name'],
+                            'phone' => $lineData['provider_phone']
+                        ]);
+                    }
+
+
+                } else {
+                    $request->validate([
+                        'lines.' . $index . '.exist_provider' => 'required|exists:providers,id',
+                    ], [
+                        'lines.' . $index . 'exist_provider.required' => 'Le choix du fournisseur est obligatoire dans la ligne ' . ($index + 1) . '.',
+                        'lines.' . $index . 'exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
+                    ]);
+                    $provider = Provider::find($lineData['exist_provider']);
+                }
+
+                if ($lineData['provider_name']) {
+                    $request->validate([
+                        'lines.' . $index . '.purchase_price' => 'required',
+                    ], [
+                        'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit> ainsi que le fournisseur.',
+                    ]);
+                }
+                if (isset($provider)) {
+                    $quotationLine->purchase_price = $lineData['purchase_price'];
+                    $quotationLine->provider_id = $provider->id;
+                }
+
+
+                $quotationLine->save();
+            }
+
+//            DB::rollBack();
+            DB::commit();
+
+            return redirect()->route('folders.show', $request->input('folder'));
+
         }
         catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Erreur lors du traitement: ' . $e->getMessage());
 
-                // Gérez l'erreur ou redirigez vers une page d'erreur
-            return redirect()->back()->withErrors(['error', 'Erreur technique lors du traitement' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error', 'Erreur lors du traitement: ' . $e->getMessage()]);
         }
     }
 
-    public function deleteLine( Request $request )
+    public function uploadFiles(Request $request, Folder $folder)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        DB::beginTransaction();
-        try {
-            $ql = QuotationLine::findOrFail($request->input('line_id'));
-            $quotation = $ql->quotation;
+        $request->validate([
+            'type' => 'required|string|max:255'
+        ], [
+            'label.required' => 'Le champ type document est requis.'
+        ]);
 
-            $quotation->total -= $ql->quantity ? $ql->price * $ql->quantity * (1 + ($ql->TVA/100)) : $ql->price  * (1 + ($ql->TVA/100));
-            $quotation->save();
-            $ql->delete();
-            DB::commit();
+        $type = $request->input('type');
 
-            return 'success';
-        } catch (\Exception $ex) {
+        if ($request->hasFile('documents')) {
+            if ($type == "DV" || $type == "DA" || $type == "DF") {
+                if (count($request->file('documents')) > 1) {
+                    return redirect()->back()->withErrors(['error' => 'vous ne pouvez pas ajouter plusieurs documents à la fois pour le type selectionné.']);
+                }
 
-            DB::rollBack();
-            Log::error('Erreur lors du traitement: ' . $ex->getMessage());
-            return 'Erreur technique lors du traitement';
+                $request->validate([
+                    'label' => 'required|string|max:255'
+                ], [
+                    'label.required' => 'Le champ libellé du document est requis pour les documents de vehicule et d\'assurance.'
+                ]);
+            }
+
+            foreach ($request->file('document') as $file) {
+                $doc = new FolderDocument();
+                $doc->folder_id = $folder->id;
+                $doc->type = $request->input('type');
+                $doc->label = $request->input('label');
+                $doc->name = UploadController::folderDocs($file, $folder, $doc->type);
+                $doc->save();
+            }
+
+            return redirect()->route('folders.show', $folder)->with('success', 'Fichiers téléchargés avec succès!');
+        } else {
+            return redirect()->back()->withErrors(['error' => 'Les documents sont obligatoires.']);
         }
+
+
+
+
     }
+
+
+
+
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Facture {{$invoice->quotation->client->name}}</title>
+    <title>Facture {{$invoice->folder->client->name}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,22 +95,22 @@
         </tr>
         <tr>
             <th>Vehicule</th>
-            <td>{{$invoice->quotation->vehicle->label}}</td>
+            <td>{{$invoice->folder->vehicle->label}}</td>
             <th>Client</th>
-            <td>{{($invoice->quotation->client->user ? (($invoice->quotation->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $invoice->quotation->client->name}}</td>
+            <td>{{($invoice->folder->client->user ? (($invoice->folder->client->user->sexe == 'H' ? 'Mr' : 'Mme') . ' ') : '') . $invoice->folder->client->name}}</td>
 
         </tr>
         <tr>
             <th>Chassis No</th>
-            <td>{{$invoice->quotation->vehicle->chassis_number}}</td>
+            <td>{{$invoice->folder->vehicle->chassis_number}}</td>
             <th>Immatricule</th>
-            <td>{{$invoice->quotation->vehicle->registration}}</td>
+            <td>{{$invoice->folder->vehicle->registration}}</td>
         </tr>
         <tr>
             <th></th>
             <td></td>
             <th>Assurance</th>
-            <td>{{$invoice->quotation->vehicle->insurance}}</td>
+            <td>{{$invoice->folder->vehicle->insurance}}</td>
         </tr>
         <!-- Additional rows as needed -->
     </table>
@@ -128,7 +128,7 @@
         @foreach($invoice->invoiceLines as $line)
             @if($line->type != 'MOD')
                 <tr>
-                    <td><b>{{$line->state}}</b></td>
+                    <td><b>{{$line->reference ?? 'Occasion'}}</b></td>
                     <td><b>{{$line->description}}</b></td>
                     <td><b>{{$line->quantity}}</b></td>
                     <td><b>{{number_format($line->price, 2)}}</b></td>
@@ -140,6 +140,10 @@
                     $totalHT += $line->price * $line->quantity;
                     $totalTTC += $line->price * $line->quantity * (1 + ($line->TVA/100));
                     ?>
+            @else
+                <?php
+                    $MOD_exist = 'true';
+                ?>
             @endif
         @endforeach
         <tr style="margin-top: 40px !important;">
@@ -160,6 +164,7 @@
             <td></td>
             <td></td>
         </tr>
+        @if(isset($MOD_exist))
         <tr style="margin-top: 40px !important;">
             <td></td>
             <td><u>{{strtoupper($invoice->title)}}  :</u></td>
@@ -169,6 +174,7 @@
             <td></td>
             <td></td>
         </tr>
+        @endif
         @foreach($invoice->invoiceLines as $line)
             @if($line->type == 'MOD')
                     <?php
@@ -195,11 +201,11 @@
         <table class="totals-table" style="width: 100% !important;" >
             <tr>
                 <th style="width: 80% !important;">Total HT :</th>
-                <td><b>{{$totalHT}} DH</b></td>
+                <td><b>{{number_format($totalHT, 2)}} DH</b></td>
             </tr>
             <tr>
                 <th>Total TTC :</th>
-                <td><b>{{$totalTTC}} DH</b></td>
+                <td><b>{{number_format($totalTTC, 2)}} DH</b></td>
             </tr>
         </table>
     </div>

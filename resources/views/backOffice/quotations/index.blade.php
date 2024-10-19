@@ -45,9 +45,6 @@
                         <div class="x_title">
                             <h2>
                                 Liste des Devis
-                                <a class="ml-3" href="{{route('quotations.create')}}">
-                                    <i class="fa fa-plus-circle"></i>
-                                </a>
                             </h2>
 
                             <ul class="nav navbar-right panel_toolbox">
@@ -88,10 +85,10 @@
                                                         {{$quotation->id}}
                                                     </td>
                                                     <td>
-                                                        {{ $quotation->client->name }}
+                                                        {{ $quotation->folder->client->name }}
                                                     </td>
                                                     <td>
-                                                        {{ $quotation->vehicle->label }}
+                                                        {{ $quotation->folder->vehicle->label }}
                                                     </td>
                                                     <td>
                                                         {{ $quotation->created_at }}

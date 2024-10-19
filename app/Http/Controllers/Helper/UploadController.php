@@ -19,6 +19,36 @@ class UploadController extends Controller
 
         return $filename;
     }
+
+    public static function CInvoiceDoc(Request $request)
+    {
+
+        $file = $request->file('document');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = "facture-achats-".uniqid(time()).".".$extension;
+        $file->move('uploads/achats/facture/',$filename);
+
+        return $filename;
+    }
+
+    public static function folderDocs($file, $folder, $type)
+    {
+        $folderPath = 'uploads/dossiers_clients/' . $folder->client->name . '/';
+
+        // Check if directory exists, if not, create it
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0777, true);  // Create directory with full permissions if it doesn't exist
+        }
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+        // Handle file upload
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = uniqid($originalName . '-') . '.' . $extension;
+        $file->move($folderPath, $filename);
+
+        return $filename;
+    }
+
     public static function supplierCreditDoc(Request $request)
     {
 

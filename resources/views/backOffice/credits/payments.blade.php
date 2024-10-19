@@ -77,10 +77,10 @@
                                                         {{$credit->id}}
                                                     </td>
                                                     <td>
-                                                        {{ $credit->quotation->client->name }}
+                                                        {{ $credit->folder->client->name }}
                                                     </td>
                                                     <td>
-                                                        {{ $credit->quotation->vehicle->label }}
+                                                        {{ $credit->folder->vehicle->label }}
                                                     </td>
                                                     <td>
                                                         <b style="color: #25e1cf">{{ $credit->total }} DH</b>

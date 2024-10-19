@@ -39,6 +39,33 @@
 
             <div class="clearfix"></div>
 
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger alert-dismissible" role="alert" id="myAlert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        {{ $error }}
+                    </div>
+                @endforeach
+            @endif
+
+            <div class="alert alert-info alert-dismissible" role="alert" id="myAlert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                Vous ne pouvez pas supprimer des dossiers contenant des devis.
+            </div>
+
+            @if (session()->has('info'))
+                <div class="alert alert-info alert-dismissible" role="alert" id="myAlert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    {{ session('info') }}
+                </div>
+            @endif
+
             <div class="row">
                 <div class="col-md-12 col-sm-12 ">
                     <div class="x_panel">
@@ -99,15 +126,15 @@
                                                     <td>
 
                                                         <div class="d-flex p-0 m-0">
-                                                            <a href="{{ route('folders.edit', $folder) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;
-                                                                    display: flex;
-                                                                    align-items: center"
-                                                            >
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <a href="{{ route('folders.show', $folder) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+{{--                                                            <a href="{{ route('folders.edit', $folder) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;--}}
+{{--                                                                    line-height: 1;--}}
+{{--                                                                    padding: .4em .8em !important;--}}
+{{--                                                                    display: flex;--}}
+{{--                                                                    align-items: center"--}}
+{{--                                                            >--}}
+{{--                                                                <i class="fa fa-edit"></i>--}}
+{{--                                                            </a>--}}
+                                                            <a href="{{ route('folders.show', $folder) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;

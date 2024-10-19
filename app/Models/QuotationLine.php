@@ -18,6 +18,7 @@ class QuotationLine extends Model
         'TVA',
         'quantity',
         'provider_id',
+        'quotation_id',
         'purchase_price'
     ];
 

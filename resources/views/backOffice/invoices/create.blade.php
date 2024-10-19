@@ -47,12 +47,12 @@
                         <div class="x_content">
                             <form method="post" action="{{ route('invoices.store') }}" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" value="{{$quotation->id}}" name="quotation">
+                                <input type="hidden" value="{{$folder->id}}" name="folder">
                                 <div class="client-infos">
                                     <div class="field item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">Client</label>
                                         <div class="col-md-6 col-sm-6">
-                                            <input disabled class="form-control" value="{{ $quotation->client->name }}" data-validate-length-range="6" data-validate-words="2" name="name"  placeholder="ex. John f. Kennedy"  />
+                                            <input disabled class="form-control" value="{{ $folder->client->name }}" data-validate-length-range="6" data-validate-words="2" name="name"  placeholder="ex. John f. Kennedy"  />
                                         </div>
                                     </div>
                                 </div>
@@ -61,7 +61,7 @@
                                     <div class="field item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3  label-align">Véhicule</label>
                                         <div class="col-md-6 col-sm-6">
-                                            <input disabled class="form-control" value="{{ $quotation->vehicle->label }}" data-validate-length-range="6" data-validate-words="2" name="name"  placeholder="ex. John f. Kennedy"  />
+                                            <input disabled class="form-control" value="{{ $folder->vehicle->label }}" data-validate-length-range="6" data-validate-words="2" name="name"  placeholder="ex. John f. Kennedy"  />
                                         </div>
                                     </div>
                                 </div>
@@ -71,64 +71,103 @@
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Titre</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ $quotation->title }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
+                                        <input class="form-control" value="{{ $folder->title }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
                                         <hr>
                                     </div>
                                 </div>
 
                                 <div id="invoiceLines">
-                                    @foreach($quotation->quotationLines as $i => $ql)
                                     <div class="invoiceLine">
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <input readonly class="form-control" value="{{ $ql->type }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][type]" />
+                                                <select name="lines[${linesNumber}][type]" id="type" class="form-control select-type" onChange="handleSelectChange(event)">
+                                                    <option value="" selected disabled>Selectionner le type</option>
+                                                    <option value="Produit" >Produit</option>
+                                                    <option value="MOD">MOD</option>
+                                                </select>
                                             </div>
                                         </div>
 
-                                        <div class="field item form-group">
-                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
-                                            <div class="col-md-6 col-sm-6">
-                                                <input readonly class="form-control" value="{{ $ql->description }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][description]"  placeholder="ex. PARE CHOC AV" />
-                                            </div>
-                                        </div>
+                                        <div class="product-fields" style="display: none;">
 
-                                        @if($ql->type != 'MOD')
                                             <div class="field item form-group">
-                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Produit</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <input readonly class="form-control" value="{{ $ql->state }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][state]"  />
+                                                    <select name="lines[${linesNumber}][exist_product]" class="form-control exist_product" >
+                                                        <option value="" selected disabled>Selectionner Produit</option>
+                                                        @foreach($products as $product)
+                                                            <option value="{{$product->id}}">{{$product->label . '-' . $product->ref}}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
-                                            @if($ql->reference)
-                                                <div class="field item form-group">
-                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Reference</label>
-                                                    <div class="col-md-6 col-sm-6">
-                                                        <input readonly class="form-control" value="{{ $ql->reference }}" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][reference]"  />
-                                                    </div>
-                                                </div>
-                                            @endif
+
+{{--                                            <div class="field item form-group">--}}
+{{--                                                <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
+{{--                                                <div class="col-md-6 col-sm-6">--}}
+{{--                                                    <p style="padding: 5px;">--}}
+{{--                                                        <input type="checkbox" name="lines[${linesNumber}][new_product]" id="new-product-check" value="Nouveau" class="flat" onChange="toggleNewProduct(event)"/> Nouveau Produit--}}
+{{--                                                    </p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+
+{{--                                            <div class="new-product-form" style="display: none;">--}}
+{{--                                                <div class="field item form-group">--}}
+{{--                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>--}}
+{{--                                                    <div class="col-md-6 col-sm-6">--}}
+{{--                                                        <input class="form-control" value="{{ old('label') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][label]"  placeholder="ex. PARE CHOC AV" />--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="field item form-group">--}}
+{{--                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>--}}
+{{--                                                    <div class="col-md-6 col-sm-6">--}}
+{{--                                                        <select name="lines[${linesNumber}][state]" id="state" class="form-control" onChange="handleSelectState(event)">--}}
+{{--                                                            <option value="null" selected disabled>Selectionner l'état</option>--}}
+{{--                                                            <option value="Occasion" >Occasion</option>--}}
+{{--                                                            <option value="Nouveau">Neuf</option>--}}
+{{--                                                            <option value="Adaptable">Adaptable</option>--}}
+{{--                                                        </select>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="field item form-group refInput" style="display: none;">--}}
+{{--                                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Référence</label>--}}
+{{--                                                    <div class="col-md-6 col-sm-6">--}}
+{{--                                                        <input type="text" value="{{ old('ref') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][reference]"  />--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
 
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <input type="text" value="{{ $ql->quantity }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][quantity]"  />
+                                                    <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
                                                 </div>
                                             </div>
-                                        @endif
+                                        </div>
 
-
+                                        <div class="mod-fields" style="display: none;">
+                                            <div class="field item form-group">
+                                                <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                                                <div class="col-md-6 col-sm-6">
+                                                    <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. MONTAGE DEMONTAGE" />
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ $ql->price }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][price]"  placeholder="" />
+                                                <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
                                             </div>
                                         </div>
+
                                         <div class="field item form-group">
                                             <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
                                             <div class="col-md-6 col-sm-6">
-                                                <input type="text" value="{{ $ql->TVA }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[{{$i}}][TVA]"  placeholder="" />
+                                                <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][TVA]"  placeholder="" />
                                             </div>
                                         </div>
                                         <div class="field item form-group">
@@ -138,13 +177,18 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @endforeach
+                                    <div class="field item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                        <div class="col-md-6 col-sm-6 d-flex justify-content-center">
+                                            <button id="addInvoiceLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
+                                        </div>
+                                    </div>
                                 </div>
 
 {{--                                <div class="field item form-group">--}}
 {{--                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
 {{--                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">--}}
-{{--                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
+{{--                                        <button id="addInvoiceLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
 {{--                                    </div>--}}
 {{--                                </div>--}}
 
@@ -152,7 +196,7 @@
                                     <div class="form-group">
                                         <div class="col-md-6 offset-md-3  pt-2">
                                             <button type='submit' class="btn btn-primary">Submit</button>
-                                            <a href="{{route('quotations.index')}}" class="btn btn-secondary">Annuler</a>
+                                            <a href="{{route('folders.show', $folder->id)}}" class="btn btn-secondary">Annuler</a>
                                         </div>
                                     </div>
                                 </div>
@@ -181,12 +225,76 @@
         }
     </script>
 
-{{--    ajouter ligne devis on click--}}
+    <script>
+        function toggleNewProduct(event) {
+            let NewProductCheckbox = event.target;
+            let invoiceLine = $(NewProductCheckbox).closest('.invoiceLine');
+            let productForm = invoiceLine.find('.new-product-form');
+            let existProduct = invoiceLine.find('.exist_product');
+
+            if (NewProductCheckbox.checked) {
+                productForm.show();
+                existProduct.prop('disabled', true);
+            } else {
+                productForm.hide();
+                existProduct.prop('disabled', false);
+            }
+        }
+
+        function handleSelectState(event) {
+            let selectBox = event.target;
+            let invoiceLine = $(selectBox).closest('.invoiceLine');
+            let refInput = invoiceLine.find('.refInput');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Nouveau") {
+                refInput.show();
+            } else {
+                refInput.hide();
+            }
+        }
+
+        function toggleNewProvider(event) {
+            let NewProviderCheckbox = event.target;
+            let invoiceLine = $(NewProviderCheckbox).closest('.invoiceLine');
+            let providerForm = invoiceLine.find('.new-provider-form');
+            let existProvider = invoiceLine.find('.exist_provider');
+
+            if (NewProviderCheckbox.checked) {
+                providerForm.show();
+                existProvider.prop('disabled', true);
+            } else {
+                providerForm.hide();
+                existProvider.prop('disabled', false);
+            }
+        }
+
+        function handleSelectChange(event) {
+            let selectBox = event.target;
+            let invoiceLine = $(selectBox).closest('.invoiceLine');
+            let productFields = invoiceLine.find('.product-fields');
+            let providerFields = invoiceLine.find('.provider-infos');
+            let modFields = invoiceLine.find('.mod-fields');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Produit") {
+                productFields.show();
+                providerFields.show();
+                modFields.hide();
+            } else {
+                productFields.hide();
+                providerFields.hide();
+                modFields.show();
+            }
+        }
+    </script>
+
+    {{--    ajouter ligne devis on click--}}
     <script>
 
-        document.getElementById('addDevisLine').addEventListener('click', ajouterLigneDevis);
+        document.getElementById('addInvoiceLine').addEventListener('click', addInvoiceLigne);
         let linesNumber = document.querySelectorAll(".invoiceLine").length;
-        function ajouterLigneDevis(e) {
+        function addInvoiceLigne(e) {
 
             e.preventDefault();
 
@@ -194,33 +302,29 @@
             nouvelleLigne.classList.add('invoiceLine');
             nouvelleLigne.classList.add('invoiceLine-new');
             nouvelleLigne.innerHTML = `
-                </hr>
+            </hr>
 
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
-                    <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][type]" id="type" class="form-control" >
-                            <option value="" selected disabled>Selectionner le type</option>
-                            <option value="Produit" >Produit</option>
-                            <option value="MOD">MOD</option>
-                        </select>
-                    </div>
+            <div class="field item form-group">
+                <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
+                <div class="col-md-6 col-sm-6">
+                    <select name="lines[${linesNumber}][type]" id="type" class="form-control select-type" onChange="handleSelectChange(event)">
+                        <option value="" selected disabled>Selectionner le type</option>
+                        <option value="Produit" >Produit</option>
+                        <option value="MOD">MOD</option>
+                    </select>
                 </div>
+            </div>
+
+            <div class="product-fields" style="display: none;">
 
                 <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                    <label class="col-form-label col-md-3 col-sm-3  label-align">Produit</label>
                     <div class="col-md-6 col-sm-6">
-                        <input class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. PARE CHOC AV" />
-                    </div>
-                </div>
-
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                    <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][state]" id="state" class="form-control" >
-                            <option value="null" selected >Selectionner l'etat</option>
-                            <option value="Occasion" >Occasion</option>
-                            <option value="Nouveau">Nouveau</option>
+                        <select name="lines[${linesNumber}][exist_product]" class="form-control exist_product" >
+                            <option value="" selected disabled>Selectionner Produit</option>
+                            @foreach($products as $product)
+                                <option value="{{$product->id}}">{{$product->label . '-' . $product->ref}}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -228,153 +332,45 @@
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
                     <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
+                        <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
                     </div>
                 </div>
+            </div>
 
+            <div class="mod-fields" style="display: none;">
                 <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
+                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
                     <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
+                        <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. MONTAGE DEMONTAGE" />
                     </div>
                 </div>
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
-                    <div class="col-md-6 col-sm-6">
-                        <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][TVA]"  placeholder="" />
-                    </div>
+            </div>
+
+            <div class="field item form-group">
+                <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
+                <div class="col-md-6 col-sm-6">
+                    <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
                 </div>
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
-                    <div class="col-md-6 col-sm-6 d-flex ">
-                        <button type="button" class="btn btn-danger deleteLineBtn" onclick="deleteLine(event)"><i class="fa fa-trash-o"></i></button>
-                    </div>
+            </div>
+
+            <div class="field item form-group">
+                <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
+                <div class="col-md-6 col-sm-6">
+                    <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][TVA]"  placeholder="" />
                 </div>
+            </div>
+            <div class="field item form-group">
+                <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                <div class="col-md-6 col-sm-6 d-flex ">
+                    <button type="button" class="btn btn-danger deleteLineBtn" onclick="deleteLine(event)"><i class="fa fa-trash-o"></i></button>
+                </div>
+            </div>
 `;
 
             linesNumber++;
+
             document.getElementById('invoiceLines').appendChild(nouvelleLigne);
         }
-    </script>
-
-    <script>
-        function toggleUserInfos() {
-            var checkbox = document.getElementById('addAccountCheckbox');
-            var userInfosDiv = document.querySelector('.user-infos');
-
-            if (checkbox.checked) {
-                userInfosDiv.style.display = 'block';
-            } else {
-                userInfosDiv.style.display = 'none';
-            }
-        }
-
-        var checkbox = document.getElementById('addAccountCheckbox');
-        checkbox.addEventListener('change', toggleUserInfos);
-
-        toggleUserInfos();
-    </script>
-
-    <script>
-        function toggleNewClientForm() {
-
-            var clientExistant = document.getElementById('exist_client');
-            var newClientCheckbox = document.getElementById('nouveau-client-check');
-            var newClientForm = document.getElementById('nouveau-client-form');
-            var newVehicleForm = document.getElementById('new-vehicle-form');
-            var newVehicleCheckbox = document.getElementById('new-vehicle-check');
-
-
-            newVehicleCheckbox.checked = newClientCheckbox.checked;
-
-            if (newClientCheckbox.checked) {
-                newClientForm.style.display = 'block';
-                clientExistant.disabled = true;
-                newVehicleForm.style.display = 'block'
-            } else {
-                newClientForm.style.display = 'none';
-                clientExistant.disabled = false;
-                newVehicleForm.style.display = 'none'
-            }
-        }
-
-        var newClientCheckbox = document.getElementById('nouveau-client-check');
-        newClientCheckbox.addEventListener('change', toggleNewClientForm);
-
-        toggleNewClientForm();
-    </script>
-
-    <script>
-        document.getElementById('exist_client').addEventListener('change', function() {
-            var vehiclesSelect = document.getElementById('exist_vehicle');
-            var selectedOption = this.options[this.selectedIndex];
-            var vehiclesData = JSON.parse(selectedOption.getAttribute('data-vehicles'));
-
-            vehiclesSelect.innerHTML = ''; // Supprimer les anciennes options
-            vehiclesData.forEach(function(vehicle) {
-                var option = document.createElement('option');
-                option.value = vehicle.id; // Assurez-vous que vous avez un attribut id pour chaque véhicule
-                option.text = vehicle.label; // Changer cela selon la structure de vos données de véhicule
-                vehiclesSelect.appendChild(option);
-            });
-        });
-        function toggleNewVehicleForm() {
-
-            var newVehicleCheckbox = document.getElementById('new-vehicle-check');
-            var newVehicleForm = document.getElementById('new-vehicle-form');
-            var vehiclesSelect = document.getElementById('exist_vehicle');
-
-            if (newVehicleCheckbox.checked) {
-                newVehicleForm.style.display = 'block';
-                vehiclesSelect.disabled = true;
-            } else {
-                newVehicleForm.style.display = 'none';
-                vehiclesSelect.disabled = false;
-            }
-        }
-
-        var newVehicleCheckbox = document.getElementById('new-vehicle-check');
-        newVehicleCheckbox.addEventListener('change', toggleNewVehicleForm);
-
-        toggleNewClientForm();
-    </script>
-
-    <script>
-        function showFormEntreprise(e) {
-            e.preventDefault();
-            var formEntreprise = document.getElementById('formEntreprise');
-            var formPersonne = document.getElementById('formPersonne');
-            var btnEntreprise = document.getElementById('btn-entreprise');
-            var btnPersonne = document.getElementById('btn-personne');
-
-            formEntreprise.style.display = 'block';
-            formPersonne.style.display = 'none';
-
-            btnEntreprise.classList.add('active');
-            btnPersonne.classList.remove('active');
-        }
-
-        function showFormPersonne(e) {
-            e.preventDefault();
-            var formEntreprise = document.getElementById('formEntreprise');
-            var formPersonne = document.getElementById('formPersonne');
-            var btnEntreprise = document.getElementById('btn-entreprise');
-            var btnPersonne = document.getElementById('btn-personne');
-
-            formEntreprise.style.display = 'none';
-            formPersonne.style.display = 'block';
-
-            btnEntreprise.classList.remove('active');
-            btnPersonne.classList.add('active');
-        }
-
-        var btnEntreprise = document.getElementById('btn-entreprise');
-        btnEntreprise.addEventListener('click', showFormEntreprise);
-
-        var btnPersonne = document.getElementById('btn-personne');
-        btnPersonne.addEventListener('click', showFormPersonne);
-
-        showFormPersonne();
     </script>
 
 
