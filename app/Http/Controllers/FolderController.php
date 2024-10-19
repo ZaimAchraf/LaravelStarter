@@ -63,9 +63,11 @@ class FolderController extends Controller
             'Images avant' => $folder->documents->where('type', 'IMG_AV')->count() > 0,
             'Images en cours' => $folder->documents->where('type', 'IMG_EC')->count() > 0,
             'Images après' => $folder->documents->where('type', 'IMG_AP')->count() > 0,
-            'Devis confirmés' => $folder->quotations->where('type', 'accorde')->count() > 0,
+            'Devis confirmés' => $folder->quotations->where('type', 'Accordé')->count() > 0,
             'Facture' => $folder->invoices->count() > 0 // Assumer qu'il y a une relation invoices avec le folder
         ];
+
+//        return $steps;
 
         $totalSteps = count($steps);
         $completedSteps = count(array_filter($steps));
