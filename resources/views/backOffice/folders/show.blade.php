@@ -68,7 +68,7 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>Dossier : {{$folder->title}}</h3>
+                    <h3>Dossier : {{$folder->title}} </h3>
                 </div>
             </div>
 
@@ -81,6 +81,17 @@
                     </button>
                     {{ session('success') }}
                 </div>
+            @endif
+
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger alert-dismissible" role="alert" id="myAlert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        {{ $error }}
+                    </div>
+                @endforeach
             @endif
 
             @if (!$steps["Images avant"])
@@ -108,7 +119,11 @@
 
             <!-- Progress bar pour montrer la progression globale -->
             <div class="container mt-4">
-                <h4>Progression du dossier</h4>
+                @foreach($steps as $stepName => $isComplete)
+                    <span class="badge {{ $isComplete ? 'bg-success' : 'bg-secondary' }} mb-1" style="color: white !important;">
+                        {{ $stepName }} {{ $isComplete ? '✔️' : '❌' }}
+                    </span>
+                @endforeach
                 <div class="progress">
                     @php
                         $steps = collect($steps);
@@ -130,11 +145,11 @@
                         <!-- Barre de progression avec étapes complètes et incomplètes -->
                     <div class="progress-bar bg-success pt-1 pb-1 " role="progressbar" style="width: {{ $completedPercentage }}%;">
                         <div class="pt-1">
-                            {{ $completedCount }} étapes incomplètes
+                            {{ $completedCount }} étapes OK
                         </div>
                     </div>
                     <div class="progress-bar bg-danger" role="progressbar" style="width: {{ 100 - $completedPercentage }}%;">
-                        {{ $totalSteps - $completedCount }} étapes incomplètes
+                        {{ $totalSteps - $completedCount }} étapes KO
                     </div>
                 </div>
             </div>
@@ -178,14 +193,20 @@
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                                    <strong>Credit : @if($folder->credit->total == $folder->credit->paid) <span class="text-success">(OK)</span> @endif </strong>
-                                    <br>
-                                    Total : <b><span class="text-primary">{{$folder->credit->total}} DH</span></b><br>
-                                    Payé  : <b><span class="text-danger">{{$folder->credit->paid}} DH</span></b><br>
+                                    @if(isset($folder->credit) && $folder->credit->total != 0)
+                                        <strong>Credit : @if($folder->credit->total == $folder->credit->paid) <span class="text-success">(OK)</span> @endif </strong>
+                                        <br>
+                                        Total : <b><span class="text-primary">{{$folder->credit->total}} DH</span></b><br>
+                                        Payé  : <b><span class="text-danger">{{$folder->credit->paid}} DH</span></b><br>
+                                    @else
+                                        <strong>
+                                            Aucun Credit pour ce dossier
+                                        </strong>
+                                    @endif
                                 </div>
                                 <!-- /.col -->
                             </div>
-{{--                            <hr>--}}
+                            {{--                            <hr>--}}
                             <div class="x_title">
                                 <h2>
                                     Details des devis

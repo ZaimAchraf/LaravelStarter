@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\CProduct;
 use App\Models\Credit;
 use App\Models\Employee;
+use App\Models\FolderDocument;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\Product;
@@ -57,8 +58,19 @@ class InvoiceController extends Controller
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $folder = Folder::find($folderID);
-        $products = CProduct::all();
+        $IMG_ENCount = FolderDocument::where('folder_id', $folder->id)
+            ->where('type', 'IMG_EN')
+            ->count();
 
+        $IMG_APCount = FolderDocument::where('folder_id', $folder->id)
+            ->where('type', 'IMG_AP')
+            ->count();
+
+        if (($IMG_ENCount == 0 || $IMG_APCount == 0) && $folder->type == 'sinistre') {
+            return redirect()->back()->withErrors(['error', 'Vous ne pouvez pas creer des factures avant d\'ajouter les photos avant, en cours et apres reparation.']);
+        }
+
+        $products = CProduct::all();
         return view('backOffice.invoices.create', compact('folder', 'products'));
     }
 

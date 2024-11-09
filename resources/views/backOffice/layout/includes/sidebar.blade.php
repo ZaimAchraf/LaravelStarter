@@ -3,7 +3,7 @@
 <div class="col-md-3 left_col">
     <div class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;margin-top: 10px;">
-            <a href="{{route('dashboard')}}" class="site_title"><i class="fa fa-car"></i> <span>Auto Shop !</span></a>
+            <a href="{{route('dashboard')}}" class="site_title"><i class="fa fa-car"></i> <span>AutoBody </span></a>
         </div>
 
         <div class="clearfix"></div>

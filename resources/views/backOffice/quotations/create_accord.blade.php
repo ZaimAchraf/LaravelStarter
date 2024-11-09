@@ -3,11 +3,23 @@
 
 @section("title","Devis Accordé")
 
+@section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+@endsection
+
 @section("style")
     <style>
         .ligneDevis-new {
             border-top: 2px solid #ddd;
             padding-top: 13px;
+        }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
         }
     </style>
 @endsection
@@ -166,6 +178,20 @@
 @endsection
 
 @section("script")
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.exist_provider').select2({
+                placeholder: "Selectionner Client",
+                allowClear: true
+            });
+            $('.exist_product').select2({
+                placeholder: "Selectionner Client",
+                allowClear: true
+            });
+        });
+    </script>
 
     <script>
         function toggleNewProduct(event) {

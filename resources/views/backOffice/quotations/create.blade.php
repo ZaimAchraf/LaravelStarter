@@ -4,6 +4,7 @@
 @section("title","Creer un Devis")
 
 @section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section("style")
@@ -11,6 +12,14 @@
         .ligneDevis-new {
             border-top: 2px solid #ddd;
             padding-top: 13px;
+        }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
         }
     </style>
 @endsection
@@ -61,9 +70,9 @@
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Type devis</label>
                                     <div class="col-md-6 col-sm-6">
                                         <select name="type" class="form-control">
-                                            <option {{($folder->quotations) ? 'selected' : 'disabled'}} value="Initial" >Initial</option>
+                                            <option {{empty($folder->quotations->get(0)) ? 'selected' : 'disabled'}} value="Initial" >Initial</option>
                                             <option {{isset($Accorde) ? 'selected' : 'disabled'}} value="Accordé">Accordé</option>
-                                            <option {{!empty($folder->quotations) && !isset($Accorde) ? 'selected' : ''}} value="Aditive" >Aditive</option>
+                                            <option {{!empty($folder->quotations->get(0)) && !isset($Accorde) ? 'selected' : 'disabled'}} value="Aditive" >Aditive</option>
                                         </select>
                                     </div>
                                 </div>
@@ -177,7 +186,7 @@
                                             <div class="field item form-group">
                                                 <label class="col-form-label col-md-3 col-sm-3  label-align">Fournisseur</label>
                                                 <div class="col-md-6 col-sm-6">
-                                                    <select name="lines[0][exist_provider]" id="exist_provider" class="form-control exist_provider" >
+                                                    <select name="lines[0][exist_provider]" class="form-control exist_provider" >
                                                         <option value="" selected disabled>Selectionner Fournisseur</option>
                                                         @foreach($providers as $provider)
                                                             <option value="{{$provider->id}}">
@@ -247,6 +256,19 @@
 
 
 @section("script")
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.exist_provider').select2({
+                placeholder: "Selectionner Fournisseur",
+                allowClear: true
+            });
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
+        });
+    </script>
 
     <script>
         function toggleNewProduct(event) {
@@ -333,6 +355,8 @@
         function ajouterLigneDevis(e) {
 
             e.preventDefault();
+
+
             linesNumber++;
 
             const nouvelleLigne = document.createElement('div');
@@ -488,6 +512,15 @@
 
 
             document.getElementById('lignesDevis').appendChild(nouvelleLigne);
+
+            $('.exist_provider').select2({
+                placeholder: "Selectionner Fournisseur",
+                allowClear: true
+            });
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
         }
     </script>
 

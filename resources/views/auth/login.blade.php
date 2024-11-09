@@ -58,7 +58,7 @@
                         <br />
 
                         <div>
-                            <h1><i class="fa fa-car"></i> Auto Shop</h1>
+                            <h1><i class="fa fa-car"></i> AutoBody</h1>
                             <p>©2024 All Rights Reserved.</p>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                         <br />
 
                         <div>
-                            <h1><i class="fa fa-car"></i> Auto Shop</h1>
+                            <h1><i class="fa fa-car"></i> AutoBody</h1>
                             <p>©2024 All Rights Reserved.</p>
                         </div>
                     </div>

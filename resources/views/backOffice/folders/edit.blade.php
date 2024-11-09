@@ -9,6 +9,14 @@
             border-top: 2px solid #ddd;
             padding-top: 13px;
         }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
+        }
     </style>
 @endsection
 

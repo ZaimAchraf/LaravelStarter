@@ -4,6 +4,7 @@
 @section("title","Créer un dossier client")
 
 @section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section("style")
@@ -55,8 +56,8 @@
                                     <div class="col-md-6 col-sm-6">
                                         <select name="type_folder" class="form-control" >
                                             <option value="" selected disabled>Selectionner le type du dossier</option>
-                                            <option value="sinistre"  >sinistre</option>
-                                            <option value="service"  >service</option>
+                                            <option value="sinistre">sinistre</option>
+                                            <option value="service">service</option>
                                         </select>
                                     </div>
                                 </div>
@@ -264,6 +265,16 @@
 
 
 @section("script")
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#exist_client').select2({
+                placeholder: "Selectionner Client",
+                allowClear: true
+            });
+        });
+    </script>
 
     <script>
         function toggleUserInfos() {

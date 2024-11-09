@@ -19,25 +19,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
     ->group(function () {
-//        Route::get('/home', function () {
-//            if (Gate::allows('access-dashboard', auth()->user())) {
-//                return redirect()->route('dashboard');
-//            } elseif (Gate::allows('access-forum', auth()->user())) {
-//                return redirect()->route('forum.index');
-//            }else {
-//                return redirect()->route('login');
-//            }
-//        })->name('home');
-
         Route::get('/', function () {
             if (Gate::allows('access-dashboard', auth()->user())) {
                 return redirect()->route('dashboard');
-            } elseif (Gate::allows('access-forum', auth()->user())) {
-                return redirect()->route('forum.index');
             }else {
                 return redirect()->route('login');
             }
         })->name('home');
+        Route::get('/home', function () {
+            if (Gate::allows('access-dashboard', auth()->user())) {
+                return redirect()->route('dashboard');
+            }else {
+                return redirect()->route('login');
+            }
+        })->name('home_');
     });
 
 

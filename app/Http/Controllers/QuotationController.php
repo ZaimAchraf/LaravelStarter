@@ -46,7 +46,7 @@ class QuotationController extends Controller
             ->where('type', 'IMG_AV')
             ->count();
 
-        if ($documentCount == 0) {
+        if ($documentCount == 0 && $folder->type == 'sinistre') {
             return redirect()->back()->withErrors(['error', 'Vous ne pouvez pas creer des devis avant d\'ajouter les photos avant reparation.']);
         }
 
@@ -144,10 +144,10 @@ class QuotationController extends Controller
                             return redirect()->back()->withErrors(['errors' => 'Le produit séléctionné n\'a pas été trouvé.']);
                         }
 
-                        if ($product->Qte < ($lineData['quantity'] ?? 1)) {
-                            return 'error qte';
-                            return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
-                        }
+//                        if ($product->Qte < ($lineData['quantity'] ?? 1)) {
+//                            return 'error qte';
+//                            return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
+//                        }
 
                         $quotationLine->description = $product->label;
                         $quotationLine->state = $product->ref ? 'Nouveau' : 'Occasion';
@@ -166,8 +166,9 @@ class QuotationController extends Controller
                                 'name' => $lineData['provider_name'],
                                 'phone' => $lineData['provider_phone']
                             ]);
-                        }
 
+                            $quotationLine->provider_id = $provider->id;
+                        }
 
                     } else {
                         $request->validate([
@@ -177,6 +178,7 @@ class QuotationController extends Controller
                             'lines.' . $index . 'exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
                         ]);
                         $provider = Provider::find($lineData['exist_provider']);
+                        $quotationLine->provider_id = $provider->id;
                     }
 
                     if ($lineData['provider_name']) {
@@ -186,13 +188,12 @@ class QuotationController extends Controller
                             'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit> ainsi que le fournisseur.',
                         ]);
                     }
-                    if (isset($provider)) {
-                        $quotationLine->purchase_price = $lineData['purchase_price'];
-                        $quotationLine->provider_id = $provider->id;
-                    }
+
                 }else {
                     $quotationLine->description = $lineData['description'];
                 }
+
+                $quotationLine->purchase_price = $lineData['purchase_price'] ?? 0;
 
                 $quotationLine->save();
 
@@ -263,6 +264,19 @@ class QuotationController extends Controller
     public function destroy(Quotation $quotation)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        if (isset($quotation->quotation)) {
+            $quotation->quotation->is_active = 0;
+            $quotation->quotation->accord_id = null;
+            $quotation->quotation->save();
+            $quotation->folder->credit->total -= $quotation->total;
+            $quotation->folder->credit->save();
+        }
+
+        if(isset($quotation->accord)) {
+            return back()->withErrors(['error' => 'Impossible de supprimer un devis qui a ete deja accorde']);
+        }
+
 
         $quotation->quotationLines()->delete();
         $quotation->delete();
@@ -407,11 +421,6 @@ class QuotationController extends Controller
 
             $quotation->total = $total;
 
-            if ($quotation->credit) {
-                $quotation->credit->total = $total;
-                $quotation->credit->save();
-            }
-
             $quotation->save();
 
             DB::commit();
@@ -512,10 +521,10 @@ class QuotationController extends Controller
                                 return redirect()->back()->withErrors(['errors' => 'Le produit séléctionné n\'a pas été trouvé.']);
                             }
 
-                            if ($product->Qte < ($lineData['quantity'] ?? 1)) {
-                                return 'error qte';
-                                return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
-                            }
+//                            if ($product->Qte < ($lineData['quantity'] ?? 1)) {
+//                                return 'error qte';
+//                                return redirect()->back()->withErrors(['error', 'La quantité demandée n\'est pas disponible.']);
+//                            }
 
                             $quotationLine->description = $product->label;
                             $quotationLine->state = $product->ref ? 'Nouveau' : 'Occasion';
@@ -528,35 +537,40 @@ class QuotationController extends Controller
 
                         if (!isset($lineData['exist_provider'])) {
 
-                            ValidationHelper::validateNewProviderQuotation($request, $index);
+                            if ($lineData['provider_name']) {
+                                ValidationHelper::validateNewProviderQuotation($request, $index);
+                                $provider = Provider::Create([
+                                    'name' => $lineData['provider_name'],
+                                    'phone' => $lineData['provider_phone']
+                                ]);
 
-                            $provider = Provider::Create([
-                                'name' => $lineData['provider_name'],
-                                'phone' => $lineData['provider_phone']
-                            ]);
+                                $quotationLine->provider_id = $provider->id;
+                            }
 
                         } else {
                             $request->validate([
                                 'lines.' . $index . '.exist_provider' => 'required|exists:providers,id',
                             ], [
-                                'lines.' . $index . '.exist_provider.required' => 'Le choix du fournisseur est obligatoire dans la ligne ' . ($index + 1) . '.',
-                                'lines.' . $index . '.exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
+                                'lines.' . $index . 'exist_provider.required' => 'Le choix du fournisseur est obligatoire dans la ligne ' . ($index + 1) . '.',
+                                'lines.' . $index . 'exist_provider.exists' => 'Le Fournisseur choisi dans la ligne ' . ($index + 1) . ' n\'existe pas dans la base de données.',
                             ]);
                             $provider = Provider::find($lineData['exist_provider']);
+                            $quotationLine->provider_id = $provider->id;
                         }
 
-                        $request->validate([
-                            'lines.' . $index . '.purchase_price' => 'required',
-                        ], [
-                            'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit>.',
-                        ]);
-
-                        $quotationLine->purchase_price = $lineData['purchase_price'];
-                        $quotationLine->provider_id = $provider->id;
+                        if ($lineData['provider_name']) {
+                            $request->validate([
+                                'lines.' . $index . '.purchase_price' => 'required',
+                            ], [
+                                'lines.' . $index . '.purchase_price.required' => 'Le prix d\'achat est obligatoire si vous precisez le type <Produit> ainsi que le fournisseur.',
+                            ]);
+                        }
 
                     }else {
                         $quotationLine->description = $lineData['description'];
                     }
+
+                    $quotationLine->purchase_price = $lineData['purchase_price'] ?? 0;
 
                     $quotationLine->save();
                 }
@@ -568,6 +582,7 @@ class QuotationController extends Controller
 
             $accord->save();
             $quotation->is_active = 1;
+            $quotation->accord_id = $accord->id;
             $quotation->save();
 
             if ($quotation->folder->credit) {
@@ -581,7 +596,7 @@ class QuotationController extends Controller
 
             DB::commit();
 
-            return redirect()->route('folders.show', $folder->id)->with('success', 'L\'accord a bien été crée !');
+            return redirect()->route('folders.show', $quotation->folder->id)->with('success', 'L\'accord a bien été crée !');
         }
         catch (\Exception $e) {
             DB::rollBack();

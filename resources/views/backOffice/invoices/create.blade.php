@@ -4,6 +4,7 @@
 @section("title","Creer un Devis")
 
 @section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section("style")
@@ -11,6 +12,14 @@
         .invoiceLine-new {
             border-top: 2px solid #ddd;
             padding-top: 13px;
+        }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
         }
     </style>
 @endsection
@@ -212,6 +221,16 @@
 
 @section("script")
 
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
+        });
+    </script>
+
     <script>
         function deleteLine(event) {
             // Supprimer la ligne de devis avec l'index donné
@@ -253,37 +272,34 @@
                 refInput.hide();
             }
         }
-
-        function toggleNewProvider(event) {
-            let NewProviderCheckbox = event.target;
-            let invoiceLine = $(NewProviderCheckbox).closest('.invoiceLine');
-            let providerForm = invoiceLine.find('.new-provider-form');
-            let existProvider = invoiceLine.find('.exist_provider');
-
-            if (NewProviderCheckbox.checked) {
-                providerForm.show();
-                existProvider.prop('disabled', true);
-            } else {
-                providerForm.hide();
-                existProvider.prop('disabled', false);
-            }
-        }
+        //
+        // function toggleNewProvider(event) {
+        //     let NewProviderCheckbox = event.target;
+        //     let invoiceLine = $(NewProviderCheckbox).closest('.invoiceLine');
+        //     let providerForm = invoiceLine.find('.new-provider-form');
+        //
+        //     if (NewProviderCheckbox.checked) {
+        //         providerForm.show();
+        //     } else {
+        //         providerForm.hide();
+        //     }
+        // }
 
         function handleSelectChange(event) {
             let selectBox = event.target;
             let invoiceLine = $(selectBox).closest('.invoiceLine');
             let productFields = invoiceLine.find('.product-fields');
-            let providerFields = invoiceLine.find('.provider-infos');
+            // let providerFields = invoiceLine.find('.provider-infos');
             let modFields = invoiceLine.find('.mod-fields');
             let selectedValue = selectBox.value;
 
             if (selectedValue === "Produit") {
                 productFields.show();
-                providerFields.show();
+                // providerFields.show();
                 modFields.hide();
             } else {
                 productFields.hide();
-                providerFields.hide();
+                // providerFields.hide();
                 modFields.show();
             }
         }
@@ -370,6 +386,11 @@
             linesNumber++;
 
             document.getElementById('invoiceLines').appendChild(nouvelleLigne);
+
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
         }
     </script>
 

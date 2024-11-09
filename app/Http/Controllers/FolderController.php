@@ -318,7 +318,7 @@ class FolderController extends Controller
                 ]);
             }
 
-            foreach ($request->file('document') as $file) {
+            foreach ($request->file('documents') as $file) {
                 $doc = new FolderDocument();
                 $doc->folder_id = $folder->id;
                 $doc->type = $request->input('type');

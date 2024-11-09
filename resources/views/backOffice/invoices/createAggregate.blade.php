@@ -4,6 +4,7 @@
 @section("title","Creer une facture aggrégée")
 
 @section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section("style")
@@ -11,6 +12,14 @@
         .invoiceLine-new {
             border-top: 2px solid #ddd;
             padding-top: 13px;
+        }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
         }
     </style>
 @endsection
@@ -201,11 +210,29 @@
 
 
 @section("script")
+    <script>
+        console.log('hey');
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        console.log('hey');
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
+        });
+    </script>
 
     <script>
         function deleteLine(event) {
             // Supprimer la ligne de devis avec l'index donné
             event.preventDefault();
+            console.log('hey');
 
             var parentDiv = event.target.closest('.invoiceLine'); // Recherche le parent avec la classe 'teste'
 
@@ -287,6 +314,7 @@
         function addInvoiceLigne(e) {
 
             e.preventDefault();
+
 
             const nouvelleLigne = document.createElement('div');
             nouvelleLigne.classList.add('invoiceLine');
@@ -397,6 +425,11 @@
             linesNumber++;
 
             document.getElementById('invoiceLines').appendChild(nouvelleLigne);
+
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
         }
     </script>
 

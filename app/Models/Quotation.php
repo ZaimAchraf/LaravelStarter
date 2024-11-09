@@ -14,7 +14,8 @@ class Quotation extends Model
         'total',
         'title',
         'type',
-        'is_active'
+        'is_active',
+        'accord_id'
     ];
 
 
@@ -27,6 +28,17 @@ class Quotation extends Model
     public function folder()
     {
         return $this->belongsTo(Folder::class);
+    }
+
+    public function accord()
+    {
+        return $this->belongsTo(Quotation::class, 'accord_id', 'id');
+    }
+
+
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class, 'accord_id', 'id');
     }
 
     public function vehicle()

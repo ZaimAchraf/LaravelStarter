@@ -16,6 +16,7 @@
 @section("content-wrapper")
 
     <div class="right_col" role="main">
+
         <div class="">
             <div class="page-title">
                 <div class="title_left">
@@ -24,6 +25,16 @@
             </div>
             <div class="clearfix"></div>
 
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger alert-dismissible" role="alert" id="myAlert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        {{ $error }}
+                    </div>
+                @endforeach
+            @endif
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
@@ -82,7 +93,7 @@
                                         @error('phone')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="phone"  placeholder="ex. 0606060606" required="required" />
+                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="phone"  placeholder="ex. 0606060606"  />
                                     </div>
                                 </div>
                                 <div class="field item form-group">
@@ -91,7 +102,7 @@
                                         @error('adresse')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="adresse"  placeholder="" required="required" />
+                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="adresse"  placeholder="" />
                                     </div>
                                 </div>
                                 <div class="field item form-group">
@@ -139,7 +150,7 @@
                                     </div>
                                 </div>
                                 <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Picture<span class="required"></span></label>
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Picture</label>
                                     <div class="col-md-6 col-sm-6">
                                         <input id="picture" type="file" name="images" multiple>
                                     </div>
