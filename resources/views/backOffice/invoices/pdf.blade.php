@@ -78,9 +78,9 @@
 <body>
 <div class="invoice-box">
     <div class="logo">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/images/logo_pdf.png'))) }}" width="300px" alt="AutoBody Logo">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/images/logo_pdf.png'))) }}" width="500px" alt="AutoBody Logo">
     </div>
-    <?php $totalHT = 0;$totalTTC = 0; ?>
+    <?php $totalHT = 0;$totalTTC = 0; $HT_Taxable = 0; $HT_Not_Taxable = 0; $TotalTVA = 0; ?>
     <table class="info-table">
         <tr>
             <th>Facture N°</th>
@@ -107,8 +107,17 @@
             <td>{{$invoice->folder->vehicle->registration}}</td>
         </tr>
         <tr>
-            <th></th>
-            <td></td>
+            @if($payments)
+            <th>Reglements</th>
+            <td>
+                @foreach($payments as $payment)
+                {{$payment}} <br>
+                @endforeach
+            </td>
+            @else
+                <th></th>
+                <td></td>
+            @endif
             <th>Assurance</th>
             <td>{{$invoice->folder->vehicle->insurance}}</td>
         </tr>
@@ -145,6 +154,15 @@
                     $MOD_exist = 'true';
                 ?>
             @endif
+            <?php
+                if ($line->TVA > 0) {
+                    $HT_Taxable += $line->price * $line->quantity;
+                    $TotalTVA = $line->price * $line->quantity * ($line->TVA/100) ;
+                }else {
+                    $HT_Not_Taxable += $line->price * $line->quantity;
+                }
+            ?>
+
         @endforeach
         <tr style="margin-top: 40px !important;">
             <td></td>
@@ -174,7 +192,6 @@
             <td></td>
             <td></td>
         </tr>
-        @endif
         @foreach($invoice->invoiceLines as $line)
             @if($line->type == 'MOD')
                     <?php
@@ -195,13 +212,38 @@
                     ?>
             @endif
         @endforeach
+        @endif
+        <tr  style="border-bottom: 1px solid #818181">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </table>
 
     <div class="totals" style="display: flex; justify-content: end">
         <table class="totals-table" style="width: 100% !important;" >
+            @if($bool == 0)
+                <tr>
+                    <th style="width: 80% !important;">MONTANT (HT) TAXABLE :</th>
+                    <td><b>{{number_format($HT_Taxable, 2)}} DH</b></td>
+                </tr>
+                <tr>
+                    <th style="width: 80% !important;">MONTANT (HT) NON TAXABLE :</th>
+                    <td><b>{{number_format($HT_Not_Taxable, 2)}} DH</b></td>
+                </tr>
+            @else
+                <tr>
+                    <th style="width: 80% !important;">Total HT :</th>
+                    <td><b>{{number_format($totalHT, 2)}} DH</b></td>
+                </tr>
+            @endif
             <tr>
-                <th style="width: 80% !important;">Total HT :</th>
-                <td><b>{{number_format($totalHT, 2)}} DH</b></td>
+                <th style="width: 80% !important;">TVA :</th>
+                <td><b>{{number_format($TotalTVA, 2)}} DH</b></td>
             </tr>
             <tr>
                 <th>Total TTC :</th>

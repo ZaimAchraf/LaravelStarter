@@ -78,7 +78,7 @@
 <body>
 <div class="invoice-box">
     <div class="logo">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/images/logo_pdf.png'))) }}" width="300px" alt="AutoBody Logo">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/images/logo_pdf.png'))) }}" width="500px" alt="AutoBody Logo">
     </div>
     <?php $totalHT = 0;$totalTTC = 0; ?>
     <table class="info-table">
@@ -183,6 +183,15 @@
                     ?>
             @endif
         @endforeach
+        <tr  style="border-bottom: 1px solid #818181">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </table>
 
     <div class="totals" style="display: flex; justify-content: end">

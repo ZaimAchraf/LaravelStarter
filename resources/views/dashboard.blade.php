@@ -106,7 +106,7 @@
                         <div class="col-md-3 col-sm-12">
                             <div>
                                 <div class="x_title">
-                                    <h2>Anciens crédits clients</h2>
+                                    <h2>Anciens crédits fournisseurs</h2>
                                     <ul class="nav navbar-right panel_toolbox">
                                         <li>
                                             <a href="{{route('supplierCredits.nonPaid')}}" class="collapse-link">voir tous</a>

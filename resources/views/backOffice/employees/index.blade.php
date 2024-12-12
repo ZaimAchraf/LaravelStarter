@@ -58,9 +58,9 @@
                                             <button type="button" class="btn btn-success btn-sm">
                                                     <a href="{{ route('users.edit', $employee->user) }}" class="text-white"> <i class="fa fa-edit"></i> Edit </a>
                                             </button>
-                                            <button type="button" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-user"> </i> View Profile
-                                            </button>
+{{--                                            <button type="button" class="btn btn-primary btn-sm">--}}
+{{--                                                <i class="fa fa-user"> </i> View Profile--}}
+{{--                                            </button>--}}
                                         </div>
                                     </div>
                                 </div>

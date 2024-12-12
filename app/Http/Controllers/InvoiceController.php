@@ -35,14 +35,14 @@ class InvoiceController extends Controller
         return view('backOffice.invoices.index', compact('invoices'));
     }
 
-    public function getPDF($invoiceID) {
+    public function getPDF($invoiceID, $bool) {
 
         $invoice = Invoice::find($invoiceID);
 
 //        return view('backOffice.invoices.pdf', ['invoice' => $invoice]);
 
         $pdf = new Dompdf();
-        $pdf->loadHtml(view('backOffice.invoices.pdf', ['invoice' => $invoice]));
+        $pdf->loadHtml(view('backOffice.invoices.pdf', ['invoice' => $invoice, 'bool' => $bool, 'payments' => $invoice->payments != null ? explode('/', $invoice->payments) : false]));
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
@@ -58,15 +58,25 @@ class InvoiceController extends Controller
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $folder = Folder::find($folderID);
-        $IMG_ENCount = FolderDocument::where('folder_id', $folder->id)
-            ->where('type', 'IMG_EN')
-            ->count();
 
-        $IMG_APCount = FolderDocument::where('folder_id', $folder->id)
-            ->where('type', 'IMG_AP')
-            ->count();
+        $IMG_ECExists = false;
+        $IMG_APExists = false;
 
-        if (($IMG_ENCount == 0 || $IMG_APCount == 0) && $folder->type == 'sinistre') {
+        foreach ($folder->documents as $document) {
+            if ($document->type === 'IMG_EC') {
+                $IMG_ECExists = true;
+            }
+            if ($document->type === 'IMG_AP') {
+                $IMG_APExists = true;
+            }
+
+            // Exit early if both types are found
+            if ($IMG_ECExists && $IMG_APExists) {
+                break;
+            }
+        }
+
+        if ((!$IMG_ECExists && !$IMG_APExists) && $folder->type == 'sinistre') {
             return redirect()->back()->withErrors(['error', 'Vous ne pouvez pas creer des factures avant d\'ajouter les photos avant, en cours et apres reparation.']);
         }
 
@@ -101,6 +111,8 @@ class InvoiceController extends Controller
             $invoice = Invoice::create([
                 'folder_id' => $request->input('folder'),
                 'title' => $request->input('title'),
+                'invoice_date' => $request->input('invoice_date'),
+                'payments' => $request->input('payments')
             ]);
 
 //            return $request->input('lines');
@@ -158,8 +170,9 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         abort_if(Gate::denies('access-dashboard'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $products = CProduct::all();
 
-        return view('backOffice.invoices.edit', compact('invoice'));
+        return view('backOffice.invoices.edit', compact('invoice', 'products'));
     }
 
     public function update(Request $request)
@@ -169,30 +182,85 @@ class InvoiceController extends Controller
         DB::beginTransaction();
 
 //        $this->validateInvoiceLines($request);
+//        return $request->input('lines');
 
         $invoice = Invoice::find($request->input('invoiceID'));
+        if($request->input('number') != $invoice->number && Invoice::where('number', $request->input('number'))->count() > 0)  {
+            return redirect()->route('invoices.edit', ['invoice' => $invoice])->withErrors(['error' => 'Le numero Facture choisi existe deja !']);
+        }
 
         $total = 0;
         foreach ($request->input('lines') as $lineData) {
 
-            InvoiceLine::updateOrCreate([
-                'id' => $lineData['id']
-            ],
-            [
-                'invoice_id' => $invoice->id,
-                'description' => $lineData['description'],
-                'price' => $lineData['price'],
-                'type' => $lineData['type'],
-                'TVA' => $lineData['TVA'] ?? 0,
-                'reference' => $lineData['reference'] ?? null,
-                'quantity' => $lineData['quantity'] ?? 1,
-                'state' => $lineData['state'] ?? null
-            ]);
+            if (isset($lineData['id'])) {
+
+                $line = InvoiceLine::find($lineData['id']);
+
+                if ($line->type == 'Produit') {
+                    $product = CProduct::where('label', $lineData['description'])->first();
+
+                    $product->Qte += $line->quantity;
+
+                    if ($product->Qte < $lineData['quantity']) {
+                        return redirect()->route('invoices.edit', ['invoice' => $invoice])->withErrors(['error' => 'Le stock disponible ne permet pas l\'action courante pour le produit : ' . $product->label]);
+                    }
+
+                    $product->Qte -= $lineData['quantity'];
+                    $product->save();
+                }
+
+                InvoiceLine::updateOrCreate([
+                    'id' => $lineData['id']
+                ],
+                [
+                    'invoice_id' => $invoice->id,
+                    'description' => $lineData['description'],
+                    'price' => $lineData['price'],
+                    'type' => $lineData['type'],
+                    'TVA' => $lineData['TVA'] ?? 0,
+                    'reference' => $lineData['reference'] ?? null,
+                    'quantity' => $lineData['quantity'] ?? 1,
+                    'state' => $lineData['state'] ?? null
+                ]);
+            }else {
+
+                if ($lineData['type'] == 'Produit') {
+                    if (isset($lineData['exist_product'])) {
+
+                        $product = CProduct::find($lineData['exist_product']);
+                    }else {
+                        return redirect()->back()->withErrors(['error' => 'Il faut obligatoirement choisir un produit existant.']);
+                    }
+
+                    if ($product->Qte < $lineData['quantity']) {
+                        return redirect()->back()->withErrors(['error' => 'Le stock disponible ne permet pas l\'action courante pour le produit : ' . $product->label]);
+                    }
+
+                    $product->Qte -= $lineData['quantity'];
+                    $product->save();
+                }
+
+                InvoiceLine::create([
+                    'invoice_id' => $invoice->id,
+                    'description' => $lineData['description'] ?? $product->label,
+                    'price' => $lineData['price'],
+                    'type' => $lineData['type'],
+                    'TVA' => $lineData['TVA'] ?? 0,
+                    'reference' => $product->ref ?? null,
+                    'quantity' => $lineData['quantity'] ?? 1,
+                    'state' => $lineData['state'] ?? null
+                ]);
+            }
+
+
 
             $total += isset($lineData['quantity']) ? $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100)) : $lineData['price'] * (1 +($lineData['TVA']/100));
         }
 
         $invoice->total = $total;
+        $invoice->invoice_date = $request->input('invoice_date');
+        $invoice->payments = $request->input('payments');
+        $invoice->number = $request->input('number');
 
         $invoice->save();
 
@@ -209,6 +277,13 @@ class InvoiceController extends Controller
         $price = isset($line->quantity) ? $line->price * $line->quantity * (1 +($line->TVA/100)) : $line->price * (1 +($line->TVA/100));
         $line->invoice->total -= $price;
         $line->invoice->save();
+
+        if ($line->type == 'Produit') {
+            $product = CProduct::where('label', $line->description)->first();
+            $product->Qte += $line->quantity;
+            $product->save();
+        }
+
         $line->delete();
 
         return 'success';

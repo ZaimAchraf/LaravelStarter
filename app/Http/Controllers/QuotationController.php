@@ -225,14 +225,14 @@ class QuotationController extends Controller
         }
     }
 
-    public function getPDF($idQuotation) {
+    public function getPDF($idQuotation, $additive) {
 
         $quotation = Quotation::find($idQuotation);
 
 //        return view('backOffice.quotations.pdf', ['quotation' => $quotation]);
 
         $pdf = new Dompdf();
-        $pdf->loadHtml(view('backOffice.quotations.pdf', ['quotation' => $quotation]));
+        $pdf->loadHtml(view('backOffice.quotations.pdf', ['quotation' => $quotation, 'additive' => $additive]));
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
@@ -417,6 +417,13 @@ class QuotationController extends Controller
                 }
 
                 $total += isset($lineData['quantity']) ? $lineData['price'] * $lineData['quantity'] * (1 +($lineData['TVA']/100)) : $lineData['price']  * (1 +($lineData['TVA']/100));
+            }
+
+            if ($quotation->type == 'Accordé') {
+                $credit = $quotation->folder->credit;
+                $credit->total += ($total - $quotation->total);
+                $credit->save();
+//                return $credit;
             }
 
             $quotation->total = $total;

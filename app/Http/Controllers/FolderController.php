@@ -175,7 +175,7 @@ class FolderController extends Controller
                 'client_id' => $client->id,
                 'vehicle_id' => $vehicle->id,
                 'title' => $request->input('title'),
-                'type_folder' => $request->input('type'),
+                'type' => $request->input('type_folder')
             ]);
 
             $folder->save();
@@ -206,7 +206,6 @@ class FolderController extends Controller
         DB::beginTransaction();
 
         try {
-            DB::beginTransaction();
 
             if ($folder->quotations()->count() == 0) {
                 $folder->documents()->delete();
@@ -217,11 +216,16 @@ class FolderController extends Controller
             }
 
             DB::commit();
+
+
+//            return "success";
             return redirect()->back()->with('info', 'Dossier supprimé avec succès');
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Erreur lors du traitement: ' . $e->getMessage());
+
+//            return $e->getMessage();
 
             return redirect()->back()->withErrors(['error' => 'Erreur lors du traitement: ' . $e->getMessage()]);
         }
@@ -327,10 +331,13 @@ class FolderController extends Controller
                 $doc->save();
             }
 
+            DB::commit();
+
             return redirect()->route('folders.show', $folder)->with('success', 'Fichiers téléchargés avec succès!');
         } else {
             return redirect()->back()->withErrors(['error' => 'Les documents sont obligatoires.']);
         }
+
 
 
 

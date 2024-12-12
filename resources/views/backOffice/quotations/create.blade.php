@@ -241,7 +241,7 @@
                                     <div class="form-group">
                                         <div class="col-md-6 offset-md-3  pt-2">
                                             <button type='submit' class="btn btn-primary">Submit</button>
-                                            <a href="{{route('quotations.index')}}" class="btn btn-secondary">Annuler</a>
+                                            <a href="{{route('folders.show', $folder->id)}}" class="btn btn-secondary">Annuler</a>
                                         </div>
                                     </div>
                                 </div>

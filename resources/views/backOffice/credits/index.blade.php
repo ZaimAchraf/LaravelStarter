@@ -104,13 +104,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex p-0 m-0">
-                                                            <a href="{{ route('credits.edit', $credit) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
-                                                                    line-height: 1;
-                                                                    padding: .4em .8em !important;
-                                                                    display: flex;
-                                                                    align-items: center">
-                                                                <i class="fa fa-pencil"></i>
-                                                            </a>
+{{--                                                            <a href="{{ route('credits.edit', $credit) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;--}}
+{{--                                                                    line-height: 1;--}}
+{{--                                                                    padding: .4em .8em !important;--}}
+{{--                                                                    display: flex;--}}
+{{--                                                                    align-items: center">--}}
+{{--                                                                <i class="fa fa-pencil"></i>--}}
+{{--                                                            </a>--}}
                                                             <a href="{{ route('credits.payments', $credit) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #009893;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;

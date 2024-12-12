@@ -66,6 +66,14 @@
 
                 <ul class="nav side-menu">
                     <li>
+                        <a href="{{route('credits.index')}}">
+                            <i class="fa fa-money"></i> Crédits Clients
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav side-menu">
+                    <li>
                         <a href="{{route('aggregatedInvoices.index')}}">
                             <i class="fa fa-file-archive-o"></i> Factures Aggrégée
                         </a>

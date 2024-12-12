@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('number')->unique();
             $table->string('title')->nullable();
+            $table->date('invoice_date')->nullable();
+            $table->text('payments')->nullable();
             $table->string('yearly_counter')->nullable();
             $table->string('client');
             $table->double('total')->nullable();

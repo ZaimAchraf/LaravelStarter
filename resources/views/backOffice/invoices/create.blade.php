@@ -85,6 +85,22 @@
                                     </div>
                                 </div>
 
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Date Facture</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input type="date" class="form-control" data-validate-length-range="6" data-validate-words="2" name="invoice_date"/>
+                                        <hr>
+                                    </div>
+                                </div>
+
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Règlement</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" placeholder="e.g : reglement1/reglemet2..." data-validate-length-range="6" data-validate-words="2" name="payments"/>
+                                        <hr>
+                                    </div>
+                                </div>
+
                                 <div id="invoiceLines">
                                     <div class="invoiceLine">
                                         <div class="field item form-group">
@@ -186,20 +202,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
-                                        <div class="col-md-6 col-sm-6 d-flex justify-content-center">
-                                            <button id="addInvoiceLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
-                                        </div>
-                                    </div>
                                 </div>
 
-{{--                                <div class="field item form-group">--}}
-{{--                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
-{{--                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">--}}
-{{--                                        <button id="addInvoiceLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">
+                                        <button id="addInvoiceLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
+                                    </div>
+                                </div>
 
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">

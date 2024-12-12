@@ -13,6 +13,8 @@ class Invoice extends Model
     protected $fillable = [
         'number',
         'total',
+        'invoice_date',
+        'payments',
         'folder_id',
         'title',
         'yearly_counter'
@@ -34,23 +36,29 @@ class Invoice extends Model
 
         static::creating(function ($model) {
             $currentYear = Carbon::now()->year;
-            $currentMonth = Carbon::now()->format('m');
 
-            // Check the last entry
-            $lastEntry = static::whereYear('created_at', $currentYear)
+            // Find the last entry in AggregatedInvoice
+            $lastAggregatedEntry = static::whereYear('created_at', $currentYear)
                 ->orderBy('yearly_counter', 'desc')
                 ->first();
 
-            if ($lastEntry) {
-                $counter = $lastEntry->yearly_counter + 1;
-            } else {
-                $counter = 1; // Reset counter at the beginning of each year
-            }
+            // Find the last entry in Invoice model
+            $lastInvoiceEntry = AggregatedInvoice::whereYear('created_at', $currentYear)
+                ->orderBy('yearly_counter', 'desc')
+                ->first();
+
+            // Determine the maximum yearly_counter between the two entries
+            $lastCounter = max(
+                $lastAggregatedEntry ? $lastAggregatedEntry->yearly_counter : 0,
+                $lastInvoiceEntry ? $lastInvoiceEntry->yearly_counter : 0
+            );
+
+            // Increment the counter
+            $counter = $lastCounter + 1;
 
             // Assign the generated ID to the model
             $model->yearly_counter = $counter;
-            $model->number = $currentYear . '-' . $currentMonth . '-' . $counter;
-        });
+            $model->number = $currentYear . '/' . $counter;});
     }
 
 }

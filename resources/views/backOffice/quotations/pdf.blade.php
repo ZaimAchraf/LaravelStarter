@@ -107,8 +107,13 @@
             <td>{{$quotation->folder->vehicle->registration}}</td>
         </tr>
         <tr>
-            <th></th>
-            <td></td>
+            @if($quotation->type == 'Aditive')
+            <th>Devis Additive : </th>
+            <td>{{$additive}}</td>
+            @else
+                <th></th>
+                <td></td>
+            @endif
             <th>Assurance :</th>
             <td>{{$quotation->folder->vehicle->insurance}}</td>
         </tr>
@@ -189,6 +194,15 @@
                     ?>
             @endif
         @endforeach
+        <tr  style="border-bottom: 1px solid #818181">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </table>
 
     <div class="totals" style="display: flex; justify-content: end">
@@ -215,9 +229,13 @@
     </div>
 
     <div class="footer">
+
+
+
         <div class="company-details">
-            <p>AutoBody Repair s.a.l. Address: N 322, Lot Ennamae QI, Bensouda FES</p>
-            <p>N° de tel: 0535607454, ICE: 002300070600003, Email: autobody.repair@gmail.com</p>
+            <p>AE AutoBody&Repair s.a.r.l  Adresse: N° 322, Lot Ennamae Q.I Bensouda FES, Tél : +2128.08.59.43.40 </p>
+            <p>Tél : 06.60.45.61.26 N° d'identification fiscale: 52505846, ICE: 003090076000073, Patente: 13406777 ,</p>
+            <p>RC: 72869, Email: <a href="mailto:aeautobody.repair@gmail.com">aeautobody.repair@gmail.com</a></p>
         </div>
     </div>
 </div>

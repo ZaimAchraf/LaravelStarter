@@ -1,7 +1,7 @@
 @extends("backOffice.layout.panel")
 
 
-@section("title","Liste des Devis")
+@section("title","Liste des Payements")
 
 @section("style_links")
 
@@ -110,7 +110,9 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>
-                                Liste des payements
+                                Liste des payements <a href="{{route('credits.edit', $credit)}}">
+                                    <i class="fa fa-plus-circle"></i>
+                                </a>
                             </h2>
 
                             <ul class="nav navbar-right panel_toolbox">

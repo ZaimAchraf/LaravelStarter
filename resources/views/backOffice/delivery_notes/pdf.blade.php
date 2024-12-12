@@ -189,6 +189,15 @@
                     ?>
             @endif
         @endforeach
+        <tr  style="border-bottom: 1px solid #818181">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </table>
 
     <div class="totals" style="display: flex; justify-content: end">

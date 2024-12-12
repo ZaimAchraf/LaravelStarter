@@ -36,7 +36,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
 
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => ['web', 'auth']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/dashboard/counts', [DashboardController::class, 'getCounts']);
     Route::get('/api/dashboard/quotations-by-month', [DashboardController::class, 'getQuotationsByMonth']);
@@ -53,7 +53,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('quotations/create/{folder}', [\App\Http\Controllers\QuotationController::class, 'create'])->name('folders.quotations.create');
     Route::post('quotations/accord/create/{quotation}', [\App\Http\Controllers\QuotationController::class, 'createAccord'])->name('quotations.accord.create');
 
-    Route::get('quotations/getPDF/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getPDF'])->name('quotations.getPDF');
+    Route::get('quotations/getPDF/{idQuotation}/{additive}',[\App\Http\Controllers\QuotationController::class, 'getPDF'])->name('quotations.getPDF');
     Route::get('quotations/getBL/{idQuotation}',[\App\Http\Controllers\QuotationController::class, 'getBL'])->name('quotations.getBL');
     Route::post('/quotations/deleteLine', [\App\Http\Controllers\QuotationController::class, 'deleteLine'])->name('quotations.delete_line');
     Route::resource('quotations', \App\Http\Controllers\QuotationController::class);
@@ -74,15 +74,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::delete('/invoices/{invoice}', [\App\Http\Controllers\InvoiceController::class, 'destroy'])->name('invoices.destroy');
     Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}/edit', [\App\Http\Controllers\InvoiceController::class, 'edit'])->name('invoices.edit');
-    Route::get('/invoices/getPDF/{invoiceID}',[\App\Http\Controllers\InvoiceController::class, 'getPDF'])->name('invoices.getPDF');
+    Route::get('/invoices/getPDF/{invoiceID}/{bool}',[\App\Http\Controllers\InvoiceController::class, 'getPDF'])->name('invoices.getPDF');
     Route::post('/invoices/deleteLine', [\App\Http\Controllers\InvoiceController::class, 'deleteLine'])->name('invoices.delete_line');
 
     Route::get('/aggregated-invoices/create', [\App\Http\Controllers\AggregatedInvoiceController::class, 'create'])->name('aggregatedInvoices.create');
     Route::post('/aggregated-invoices/', [\App\Http\Controllers\AggregatedInvoiceController::class, 'store'])->name('aggregatedInvoices.store');
     Route::get('/aggregated-invoices/', [\App\Http\Controllers\AggregatedInvoiceController::class, 'index'])->name('aggregatedInvoices.index');
-    Route::get('/aggregated-invoices/{AggregatedInvoice}/edit', [\App\Http\Controllers\AggregatedInvoiceController::class, 'edit'])->name('aggregatedInvoices.edit');
+    Route::get('/aggregated-invoices/{aggregatedInvoice}/edit', [\App\Http\Controllers\AggregatedInvoiceController::class, 'edit'])->name('aggregatedInvoices.edit');
     Route::get('/aggregated-invoices/getPDF/{invoiceID}',[\App\Http\Controllers\AggregatedInvoiceController::class, 'getPDF'])->name('aggregatedInvoices.getPDF');
     Route::delete('/aggregated-invoices/{AggregatedInvoice}', [\App\Http\Controllers\AggregatedInvoiceController::class, 'destroy'])->name('aggregatedInvoices.destroy');
+    Route::put('/aggregated-invoices', [\App\Http\Controllers\AggregatedInvoiceController::class, 'update'])->name('aggregatedInvoices.update');
+    Route::post('/aggregated-invoices/deleteLine', [\App\Http\Controllers\AggregatedInvoiceController::class, 'deleteLine'])->name('aggregatedInvoices.delete_line');
 
     Route::get('/accountancy/invoices', [\App\Http\Controllers\AccountancyController::class, 'invoices'])->name('accountants.invoices');
     Route::delete('/accountancy/invoices/{SupplierInvoice}', [\App\Http\Controllers\AccountancyController::class, 'destroyInvoice'])->name('accountants.destroyInvoice');

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->foreignId('folder_id')->constrained('folders');
             $table->double('total')->nullable();
+            $table->foreignId('accord_id')->nullable()->constrained('quotations');
             $table->double('type')->default('Initial');
             $table->boolean('is_active')->default(0);
             $table->timestamps();

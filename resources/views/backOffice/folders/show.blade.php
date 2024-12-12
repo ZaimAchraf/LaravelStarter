@@ -94,6 +94,8 @@
                 @endforeach
             @endif
 
+            @if($folder->type == 'sinistre')
+
             @if (!$steps["Images avant"])
                 <div class="alert alert-info alert-dismissible" role="alert" id="myAlert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -153,6 +155,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <div class="row">
                 <div class="col-md-12 col-sm-12 ">
@@ -196,7 +199,7 @@
                                     @if(isset($folder->credit) && $folder->credit->total != 0)
                                         <strong>Credit : @if($folder->credit->total == $folder->credit->paid) <span class="text-success">(OK)</span> @endif </strong>
                                         <br>
-                                        Total : <b><span class="text-primary">{{$folder->credit->total}} DH</span></b><br>
+                                        Total : <a target="_blank" href="{{ route('credits.payments', $folder->credit) }}"><b><span class="text-primary">{{$folder->credit->total}} DH</span></b></a><br>
                                         Payé  : <b><span class="text-danger">{{$folder->credit->paid}} DH</span></b><br>
                                     @else
                                         <strong>
@@ -233,7 +236,13 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            <?php
+                                                $add = 0;
+                                            ?>
                                             @foreach ($folder->quotations as $quotation)
+                                                <?php
+                                                    if ($quotation->type == 'Aditive') $add++;
+                                                ?>
                                                 <tr>
                                                     <td>
                                                         {{$quotation->id}}
@@ -271,7 +280,7 @@
                                                             >
                                                                 <i class="fa fa-edit"></i>
                                                             </a>
-                                                            <a href="{{ route('quotations.getPDF', $quotation) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+                                                            <a href="{{ route('quotations.getPDF', [$quotation, $add]) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;
@@ -375,18 +384,29 @@
                                                     <td>
 
                                                         <div class="d-flex p-0 m-0">
-{{--                                                            <a href="{{ route('invoices.edit', ['invoice' => $invoice]) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;--}}
-{{--                                                                    line-height: 1;--}}
-{{--                                                                    padding: .4em .8em !important;--}}
-{{--                                                                    display: flex;--}}
-{{--                                                                    align-items: center"--}}
-{{--                                                            >--}}
-{{--                                                                <i class="fa fa-edit"></i>--}}
-{{--                                                            </a>--}}
-                                                            <a href="{{ route('invoices.getPDF', $invoice) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+                                                            <a href="{{ route('invoices.edit', ['invoice' => $invoice]) }}" class="text-white font-bold px-2 rounded mr-2" style="background: #2fff67;
                                                                     line-height: 1;
                                                                     padding: .4em .8em !important;
                                                                     display: flex;
+                                                                    align-items: center"
+                                                            >
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            <a href="{{ route('invoices.getPDF', [$invoice, 0]) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: #039dab;
+                                                                    line-height: 1;
+                                                                    padding: .4em .8em !important;
+                                                                    display: flex;
+                                                                    align-items: center"
+                                                            >
+                                                                <i class="fa fa-file-pdf-o"></i>
+                                                            </a>
+
+
+                                                            <a href="{{ route('invoices.getPDF', [$invoice, 1]) }}" target="_blank" class="text-white font-bold px-2 rounded mr-2" style="background: white;
+                                                                    line-height: 1;
+                                                                    padding: .4em .8em !important;
+                                                                    display: flex;
+                                                                    color: #e03939 !important;
                                                                     align-items: center"
                                                             >
                                                                 <i class="fa fa-file-pdf-o"></i>

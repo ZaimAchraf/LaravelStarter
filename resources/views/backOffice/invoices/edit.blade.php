@@ -9,7 +9,19 @@
             border-top: 2px solid #ddd;
             padding-top: 13px;
         }
+
+        .select2-container {
+            box-sizing: border-box;
+            display: inline !important;
+            margin: 0;
+            position: relative;
+            vertical-align: middle;
+        }
     </style>
+@endsection
+
+@section("style_links")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section("content-wrapper")
@@ -45,18 +57,50 @@
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Client</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ $invoice->quotation->client->name }}" data-validate-length-range="6" data-validate-words="2" name="" disabled />
+                                        <input class="form-control" value="{{ $invoice->folder->client->name }}" data-validate-length-range="6" data-validate-words="2" name="" disabled />
                                     </div>
                                 </div>
 
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Véhicule</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input class="form-control" value="{{ $invoice->quotation->vehicle->label }}" data-validate-length-range="6" data-validate-words="2" name=""  disabled />
+                                        <input class="form-control" value="{{ $invoice->folder->vehicle->label }}" data-validate-length-range="6" data-validate-words="2" name=""  disabled />
                                     </div>
                                 </div>
 
                                 <span class="section">Informations de Facture</span>
+
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Numero</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" value="{{ $invoice->number }}" data-validate-length-range="6" data-validate-words="2" name="number"/>
+                                        <hr>
+                                    </div>
+                                </div>
+
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Titre</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" value="{{ $invoice->title }}" data-validate-length-range="6" data-validate-words="2" name="title"/>
+                                        <hr>
+                                    </div>
+                                </div>
+
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Date Facture</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input type="date" class="form-control" value="{{$invoice->invoice_date}}" data-validate-length-range="6" data-validate-words="2" name="invoice_date"/>
+                                    </div>
+                                </div>
+
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Règlement</label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <input class="form-control" placeholder="e.g : reglement1/reglemet2..." value="{{$invoice->payments}}"  data-validate-length-range="6" data-validate-words="2" name="payments"/>
+                                        <hr>
+                                    </div>
+                                </div>
+                                <span class="section">Lignes de Facture</span>
 
                                 <div id="lignesDevis">
                                     @foreach($invoice->invoiceLines as $i => $line)
@@ -126,18 +170,18 @@
                                     @endforeach
                                 </div>
 
-{{--                                <div class="field item form-group">--}}
-{{--                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>--}}
-{{--                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">--}}
-{{--                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
+                                    <div class="col-md-6 col-sm-6 d-flex justify-content-center">
+                                        <button id="addDevisLine" class="btn btn-success"><i class="fa fa-plus"></i> Ajouter une ligne de Facture</button>
+                                    </div>
+                                </div>
 
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">
                                         <div class="col-md-6 offset-md-3  pt-2">1`````````
                                             <button type='submit' class="btn btn-primary">Submit</button>
-                                            <a href="{{route('invoices.index')}}" class="btn btn-secondary">Annuler</a>
+                                            <a href="{{route('folders.show', $invoice->folder->id)}}" class="btn btn-secondary">Annuler</a>
                                         </div>
                                     </div>
                                 </div>
@@ -151,6 +195,16 @@
 @endsection
 
 @section("script")
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
+        });
+    </script>
 
     <script>
         function deleteLine(event) {
@@ -184,6 +238,7 @@
                     success: function(response) {
                         // Suppression réussie, vous pouvez mettre à jour l'interface si nécessaire
                         $(".invoiceLine:eq(" + index + ")").remove();
+                        location.reload();
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
@@ -193,6 +248,68 @@
 
         }
 
+    </script>
+
+
+    <script>
+        function toggleNewProduct(event) {
+            let NewProductCheckbox = event.target;
+            let invoiceLine = $(NewProductCheckbox).closest('.invoiceLine');
+            let productForm = invoiceLine.find('.new-product-form');
+            let existProduct = invoiceLine.find('.exist_product');
+
+            if (NewProductCheckbox.checked) {
+                productForm.show();
+                existProduct.prop('disabled', true);
+            } else {
+                productForm.hide();
+                existProduct.prop('disabled', false);
+            }
+        }
+
+        function handleSelectState(event) {
+            let selectBox = event.target;
+            let invoiceLine = $(selectBox).closest('.invoiceLine');
+            let refInput = invoiceLine.find('.refInput');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Nouveau") {
+                refInput.show();
+            } else {
+                refInput.hide();
+            }
+        }
+        //
+        // function toggleNewProvider(event) {
+        //     let NewProviderCheckbox = event.target;
+        //     let invoiceLine = $(NewProviderCheckbox).closest('.invoiceLine');
+        //     let providerForm = invoiceLine.find('.new-provider-form');
+        //
+        //     if (NewProviderCheckbox.checked) {
+        //         providerForm.show();
+        //     } else {
+        //         providerForm.hide();
+        //     }
+        // }
+
+        function handleSelectChange(event) {
+            let selectBox = event.target;
+            let invoiceLine = $(selectBox).closest('.invoiceLine');
+            let productFields = invoiceLine.find('.product-fields');
+            // let providerFields = invoiceLine.find('.provider-infos');
+            let modFields = invoiceLine.find('.mod-fields');
+            let selectedValue = selectBox.value;
+
+            if (selectedValue === "Produit") {
+                productFields.show();
+                // providerFields.show();
+                modFields.hide();
+            } else {
+                productFields.hide();
+                // providerFields.hide();
+                modFields.show();
+            }
+        }
     </script>
 
     {{--    ajouter ligne devis on click--}}
@@ -209,68 +326,78 @@
             nouvelleLigne.classList.add('invoiceLine-new');
             nouvelleLigne.innerHTML = `
                 </hr>
-                <input type="hidden" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][id]" />
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
-                    <div class="col-md-6 col-sm-6">
-                        <input class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. PARE CHOC AV" />
-                    </div>
-                </div>
 
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Type</label>
                     <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][type]" id="type" class="form-control">
-                            <option value="null" selected>Selectionner le type</option>
-                            <option value="Product">Produit</option>
+                        <select name="lines[${linesNumber}][type]" id="type" class="form-control select-type" onChange="handleSelectChange(event)">
+                            <option value="" selected disabled>Selectionner le type</option>
+                            <option value="Produit" >Produit</option>
                             <option value="MOD">MOD</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Etat</label>
-                    <div class="col-md-6 col-sm-6">
-                        <select name="lines[${linesNumber}][state]" id="state" class="form-control" >
-                            <option value="null" selected >Selectionner l'etat</option>
-                            <option value="Occasion" >Occasion</option>
-                            <option value="Nouveau">Neuf</option>
-                            <option value="Adaptable">Adaptable</option>
-                        </select>
+                <div class="product-fields" style="display: none;">
+
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Produit</label>
+                        <div class="col-md-6 col-sm-6">
+                            <select name="lines[${linesNumber}][exist_product]" class="form-control exist_product" >
+                                <option value="" selected disabled>Selectionner Produit</option>
+                                @foreach($products as $product)
+            <option value="{{$product->id}}">{{$product->label . '-' . $product->ref}}</option>
+                                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <div class="field item form-group">
+        <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
+        <div class="col-md-6 col-sm-6">
+            <input type="text" value="{{ old('quantity') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
+                        </div>
                     </div>
                 </div>
 
-                <div class="field item form-group">
-                    <label class="col-form-label col-md-3 col-sm-3  label-align">Quantite</label>
-                    <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][quantity]"  />
+                <div class="mod-fields" style="display: none;">
+                    <div class="field item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3  label-align">Description</label>
+                        <div class="col-md-6 col-sm-6">
+                            <input class="form-control" value="{{ old('description') }}" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][description]"  placeholder="ex. MONTAGE DEMONTAGE" />
+                        </div>
                     </div>
                 </div>
 
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">Prix Unitaire</label>
                     <div class="col-md-6 col-sm-6">
-                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
+                        <input type="text" value="{{ old('price') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][price]"  placeholder="" />
                     </div>
                 </div>
+
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align">TVA (%)</label>
                     <div class="col-md-6 col-sm-6">
                         <input type="text" value="{{ old('TVA') }}" class="form-control" data-validate-length-range="6" data-validate-words="2" name="lines[${linesNumber}][TVA]"  placeholder="" />
                     </div>
                 </div>
-
                 <div class="field item form-group">
                     <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
                     <div class="col-md-6 col-sm-6 d-flex ">
-                        <button type="button" class="btn btn-danger" onclick="deleteLine(event)"><i class="fa fa-trash-o"></i></button>
+                        <button type="button" class="btn btn-danger deleteLineBtn" onclick="deleteLine(event)"><i class="fa fa-trash-o"></i></button>
                     </div>
                 </div>
-            `;
+`;
 
             linesNumber++;
 
             document.getElementById('lignesDevis').appendChild(nouvelleLigne);
+
+            $('.exist_product').select2({
+                placeholder: "Selectionner Produit",
+                allowClear: true
+            });
         }
     </script>
 
