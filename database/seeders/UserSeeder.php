@@ -19,9 +19,7 @@ class UserSeeder extends Seeder
         $roles = [
             ['id' => 1, 'name' => 'SUPER_ADMIN'],
             ['id' => 2, 'name' => 'MANAGER'],
-            ['id' => 3, 'name' => 'USER'],
-            ['id' => 4, 'name' => 'EMPLOYEE'],
-            ['id' => 5, 'name' => 'PROVIDER']
+            ['id' => 3, 'name' => 'USER']
         ];
 
         // Ajouter les rôles dans la table s'ils n'existent pas
@@ -33,15 +31,14 @@ class UserSeeder extends Seeder
 
         // Create a default user
         User::create([
-            'name' => 'AautoBody',
-            'email' => 'aeautobody.repair@gmail.com',
-            'username' => 'johndoe',
-            'password' => Hash::make('autobody1234'), // Hashing the password
-            'sexe' => 'M',
-            'phone' => '0535607454',
-            'adresse' => 'N 322, Lot Ennamae QI, Bensouda FES',
+            'name' => 'Achraf Zaim',
+            'email' => 'achraf.zaime@gmail.com',
+            'username' => 'Zaim_Achraf',
+            'password' => Hash::make('achraf1234'), 
+            'phone' => '0625456869',
+            // 'adresse' => 'N 322, California Street, Casablanca',
             'is_active' => true,
-            'role_id' => 1 // Assuming a role_id of 1
+            'role_id' => 1 // Assigning the SUPER_ADMIN role
         ]);
 
         // Add more users as needed

@@ -22,7 +22,7 @@ class CheckUserActiveStatus
      */
     public function handle(Login $event)
     {
-        if (!$event->user->is_active) { // Remplace `active` par le nom de ta colonne
+        if (!$event->user->is_active) { 
             Auth::logout();
             session()->flash('error', 'Votre compte est désactivé. Veuillez contacter l\'administrateur.');
             return redirect()->route('login')->send();

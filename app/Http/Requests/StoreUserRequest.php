@@ -3,32 +3,33 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 
 class StoreUserRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
-        return Gate::allows('access-dashboard');
+        return $this->user()?->can('manage-users') ?? false;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'username' => ['required', 'string', 'max:255','unique:users'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'username' => ['required', 'string', 'unique:users,username', 'max:50'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone'    => ['string', 'min:10'],
-            'adresse'  => ['nullable','string', 'max:255'],
-            'gendre'   => ['required', 'string', 'max:1'],
-            'role_id'  => ['required', 'integer', 'exists:roles,id'],
-            'images'   => ['image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'fonction' => ['nullable', 'string', 'max:255'],
-            'salaire'  => ['nullable', 'numeric', 'min:0'],
-
+            'phone' => ['nullable', 'string', 'max:20'],
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+            'picture' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'This email is already registered.',
+            'username.unique' => 'This username is already taken.',
+            'password.min' => 'Password must be at least 8 characters.',
+        ];
+    }
 }

@@ -1,7 +1,7 @@
 @extends("backOffice.layout.panel")
 
 
-@section("title","Modifier Utilisateur")
+@section("title","Créer Utilisateur")
 
 @section("style_links")
 @endsection
@@ -20,7 +20,7 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>Creer Utilisateur</h3>
+                    <h3>Créer Utilisateur</h3>
                 </div>
             </div>
             <div class="clearfix"></div>
@@ -97,15 +97,6 @@
                                     </div>
                                 </div>
                                 <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Adresse</label>
-                                    <div class="col-md-6 col-sm-6">
-                                        @error('adresse')
-                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="adresse"  placeholder="" />
-                                    </div>
-                                </div>
-                                <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Gendre<span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6">
                                         <select name="gendre" id="gendre" class="form-control" required>
@@ -122,38 +113,25 @@
                                         @enderror
                                         <select name="role_id" id="role" class="form-control" required>
                                             <option disabled selected value="">Select Role</option>
-                                            <option value="4">Employee</option>
-                                            <option value="3">Client</option>
+                                            <option value="3">User</option>
                                             <option value="2">Admin</option>
                                             <option value="1">Super Admin</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div id="additional_fields" style="display: none;">
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Fonction<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6">
-                                            @error('fonction')
-                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                            <input type="text" class="form-control" name="fonction" placeholder="ex. Manager" />
-                                        </div>
-                                    </div>
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Salaire<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6">
-                                            @error('salaire')
-                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                            <input type="text" class="form-control" name="salaire" placeholder="ex. 5000" />
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Picture</label>
                                     <div class="col-md-6 col-sm-6">
-                                        <input id="picture" type="file" name="images" multiple>
+                                        <div class="image view view-first" style="width: 100px; display: block; height: 100px">
+                                            <img id="picturePreview" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; border-radius: 4px;" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E" alt="No Image" />
+                                            <div class="mask" >
+                                                <div class="tools tools-bottom">
+                                                    <label for="picture" style="cursor: pointer"><i class="fa fa-pencil"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <input id="picture" type="file" name="picture" accept="image/*" style="display: none;" >
                                 </div>
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">
@@ -193,6 +171,31 @@
             } else {
                 additionalFields.style.display = 'none';
             }
+
+            // File upload preview
+            const fileInput = document.getElementById('picture');
+            const pictureLabel = document.querySelector('label[for="picture"]');
+            const picturePreview = document.getElementById('picturePreview');
+
+            if (pictureLabel) {
+                pictureLabel.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
+
+            // Preview image before upload
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        picturePreview.src = event.target.result;
+                        picturePreview.style.objectFit = 'cover';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
         });
     </script>
 @endsection

@@ -58,7 +58,7 @@
                         <br />
 
                         <div>
-                            <h1><i class="fa fa-car"></i> AutoBody</h1>
+                            <h1><i class="fa fa-home"></i> Appli</h1>
                             <p>©2024 All Rights Reserved.</p>
                         </div>
                     </div>
@@ -97,16 +97,6 @@
                         <input type="password" name="password_confirmation" class="form-control" placeholder="Confirmer le Mot de passe" required="" />
                     </div>
                     <div>
-                        <select name="role" id="role" class="form-control" required>
-                            <option disabled selected value="">Select Role</option>
-                            <option value="4">Employee</option>
-                            <option value="3">Client</option>
-                            <option value="2">Admin</option>
-                            <option value="1">Super Admin</option>
-                        </select>
-                    </div>
-
-                    <div>
                         <a class="btn btn-default submit" href="#"><button class="btn">Souscrire</button> </a>
                     </div>
 
@@ -121,7 +111,7 @@
                         <br />
 
                         <div>
-                            <h1><i class="fa fa-car"></i> AutoBody</h1>
+                            <h1><i class="fa fa-home"></i> Appli</h1>
                             <p>©2024 All Rights Reserved.</p>
                         </div>
                     </div>

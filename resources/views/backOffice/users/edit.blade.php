@@ -24,6 +24,19 @@
             </div>
             <div class="clearfix"></div>
 
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Erreurs de validation:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
@@ -57,15 +70,6 @@
                                     </div>
                                 </div>
                                 <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Adresse</label>
-                                    <div class="col-md-6 col-sm-6">
-                                        @error('adresse')
-                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <input type="text" class="form-control" data-validate-length-range="6" data-validate-words="2" name="adresse"  placeholder="" required="required" />
-                                    </div>
-                                </div>
-                                <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align">Gendre<span class="required">*</span></label>
                                     <div class="col-md-6 col-sm-6">
                                         @error('gendre')
@@ -84,47 +88,25 @@
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                         <select name="role_id" id="role" class="form-control" required>
-                                            <option value="4" {{$user->role->id == 4 ? 'selected' : ''}}>Employee</option>
                                             <option value="3" {{$user->role->id == 3 ? 'selected' : ''}}>Client</option>
                                             <option value="2" {{$user->role->id == 2 ? 'selected' : ''}}>Admin</option>
                                             <option value="1" {{$user->role->id == 1 ? 'selected' : ''}}>Super Admin</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div id="additional_fields" style="display: none;">
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Fonction<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6">
-                                            @error('fonction')
-                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                            <input type="text" class="form-control" value="{{$user->employee ? $user->employee->fonction : null}}" name="fonction" placeholder="ex. Manager" />
-                                        </div>
-                                    </div>
-                                    <div class="field item form-group">
-                                        <label class="col-form-label col-md-3 col-sm-3  label-align">Salaire<span class="required">*</span></label>
-                                        <div class="col-md-6 col-sm-6">
-                                            @error('salaire')
-                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                            <input type="text" class="form-control" value="{{$user->employee ? $user->employee->salaire : null}}" name="salaire" placeholder="ex. 5000" />
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="field item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3  label-align"></label>
                                     <div class="col-md-6 col-sm-6">
                                         <div class="image view view-first" style="width: 100px; display: block; height: 100px">
-                                            <img style="width: 100%; height: 100%; display: block;" src="{{asset('uploads')}}/users/{{$user->picture}}" alt="image" />
+                                            <img id="picturePreview" style="width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 4px;" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" />
                                             <div class="mask" >
                                                 <div class="tools tools-bottom">
-
                                                     <label for="picture" style="cursor: pointer"><i class="fa fa-pencil"></i></label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <input id="picture" type="file" name="images" style="display: none;" multiple>
+                                    <input id="picture" type="file" name="picture" accept="image/*" style="display: none;" >
                                 </div>
                                 <div class="ln_solid mt-1">
                                     <div class="form-group">
@@ -146,27 +128,30 @@
 @section("script")
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // File upload preview
+            const fileInput = document.getElementById('picture');
+            const pictureLabel = document.querySelector('label[for="picture"]');
+            const picturePreview = document.getElementById('picturePreview');
 
-            const roleSelect = document.getElementById('role');
-            const additionalFields = document.getElementById('additional_fields');
-            console.log(roleSelect)
-            console.log(additionalFields)
+            if (pictureLabel) {
+                pictureLabel.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
 
-            roleSelect.addEventListener('change', function() {
-                console.log(roleSelect.value)
-                if (roleSelect.value === '2' || roleSelect.value === '4') {
-                    additionalFields.style.display = 'block';
-                } else {
-                    additionalFields.style.display = 'none';
+            // Preview image before upload
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        picturePreview.src = event.target.result;
+                        picturePreview.style.objectFit = 'cover';
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
-
-            // Vérifier l'état initial du champ de rôle au chargement de la page
-            if (roleSelect.value === '2' || roleSelect.value === '4') {
-                additionalFields.style.display = 'block';
-            } else {
-                additionalFields.style.display = 'none';
-            }
         });
     </script>
 @endsection

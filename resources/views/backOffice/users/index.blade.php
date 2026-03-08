@@ -87,7 +87,7 @@
                                             @foreach ($users as $user)
                                                 <tr>
                                                     <td>
-                                                        <img src="{{asset('uploads')}}/users/{{ $user->picture }}" width="70px">
+                                                        <img src="{{ $user->profile_photo_url }}" width="70px">
                                                     </td>
                                                     <td>
                                                         {{ $user->name }}

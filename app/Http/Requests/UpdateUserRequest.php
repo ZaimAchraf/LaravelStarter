@@ -3,42 +3,34 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
-        return Gate::allows('access-dashboard');
+        $currentUser = $this->user();
+        $targetUser = $this->route('user');
+
+        if (!$currentUser) {
+            return false;
+        }
+
+        return $currentUser->can('manage-users') || ($targetUser && $currentUser->is($targetUser));
     }
 
-    public function rules()
+    public function rules(): array
     {
-        $userID = $this->route('user')->id;
+        $userId = $this->route('user')->id;
 
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($userID),
-            ],
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')->ignore($userID),
-            ],
-            'phone'    => ['string', 'min:10'],
-            'adresse'  => ['nullable','string', 'max:255'],
-            'gendre'   => ['required', 'string', 'max:1'],
-            'role_id'  => ['required', 'integer', 'exists:roles,id'],
-            'images'    => ['image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'fonction' => ['nullable', 'string', 'max:255'],
-            'salaire'  => ['nullable', 'numeric', 'min:0'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', "unique:users,email,{$userId}"],
+            'username' => ['required', 'string', "unique:users,username,{$userId}", 'max:50'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+            'picture' => ['nullable', 'image', 'max:2048'],
+            'is_active' => ['boolean'],
         ];
     }
 }

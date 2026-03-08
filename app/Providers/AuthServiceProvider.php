@@ -2,78 +2,40 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
     protected $policies = [
-        //
+        User::class => UserPolicy::class,
     ];
 
-    /**
-     * Register any authentication / authorization services.
-     */
     public function boot(): void
     {
         $this->registerPolicies();
+        $this->registerGates();
+    }
 
+    private function registerGates(): void
+    {
         Gate::define('access-dashboard', function (User $user) {
-            return in_array($user->role_id, [1, 2, 3, 4]);
+            return $user->hasPermission('access-dashboard');
         });
 
-        Gate::define('access-forum', function (User $user) {
-            return $user->role_id == 3;
+        Gate::define('manage-users', function (User $user) {
+            return $user->hasPermission('manage-users');
         });
 
         Gate::define('manage-clients', function (User $user) {
-            return in_array($user->role_id, [1, 2]);
+            return $user->hasPermission('manage-clients');
         });
 
-        Gate::define('manage-admins', function (User $user) {
-            return $user->role_id == 1;
-        });
-
-        Gate::define('see-schedules', function (User $user) {
-            return $user->role_id == 3;
-        });
-
-        Gate::define('manage-courses', function (User $user) {
-            return $user->role_id == 2;
-        });
-
-        Gate::define('see-payments', function (User $user) {
-            return $user->role_id == 3;
-        });
-
-        Gate::define('manage-payments', function (User $user) {
-            return $user->role_id == 2;
-        });
-
-        Gate::define('see-offers', function (User $user) {
-            return $user->role_id == 3;
-        });
-
-        Gate::define('manage-offers', function (User $user) {
-            return $user->role_id == 2;
-        });
-
-        Gate::define('see-events', function (User $user) {
-            return $user->role_id == 3;
-        });
-
-        Gate::define('manage-events', function (User $user) {
-            return $user->role_id == 2;
-        });
-
-        Gate::define('manage-ecommerce', function (User $user) {
-            return $user->role_id == 2;
+        Gate::define('manage-all', function (User $user) {
+            return $user->hasRole(UserRole::SUPER_ADMIN);
         });
     }
 }
